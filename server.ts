@@ -1,60 +1,53 @@
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { apiRouter } from './server/api.ts';
+import { config, isProd } from './server/config.ts';
+import { db } from './server/db.ts';
+import { createApp } from './server/app.ts';
+import { bootstrapAdmin } from './server/auth.ts';
+import { seedSampleData } from './server/seed.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function startServer() {
-  const app = express();
-  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+  await bootstrapAdmin();
+  if (config.seedSampleData) seedSampleData();
 
-  // JSON Body Parser
-  app.use(express.json({ limit: '15mb' }));
-  app.use(express.urlencoded({ extended: true, limit: '15mb' }));
+  const app = createApp();
 
-  // CORS & Preflight handling for iframe & preview environments
-  app.use((req, res, next) => {
-    const origin = req.headers.origin || '*';
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(204);
-    }
-    next();
-  });
-
-  // API router
-  app.use('/api', apiRouter);
-
-  // Health check endpoint
-  app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-  });
-
-  // Serve Frontend
-  if (process.env.NODE_ENV === 'production') {
+  if (isProd) {
     const distPath = path.resolve(__dirname, 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.resolve(distPath, 'index.html'));
-    });
+    app.get('*', (_req, res) => res.sendFile(path.resolve(distPath, 'index.html')));
   } else {
-    // Mount Vite middlewares in dev
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
+    // Imported lazily so production never loads Vite
+    const { createServer } = await import('vite');
+    const vite = await createServer({ server: { middlewareMode: true }, appType: 'spa' });
     app.use(vite.middlewares);
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Event Guest & QR Check-in Server running at http://0.0.0.0:${PORT}`);
+  const server = app.listen(config.port, '0.0.0.0', () => {
+    console.log(`🚀 Event Guest & QR Check-in Server running at http://0.0.0.0:${config.port}`);
   });
+
+  db.purgeExpiredSessions();
+  const purge = setInterval(() => db.purgeExpiredSessions(), 60 * 60 * 1000);
+  purge.unref();
+
+  // Graceful shutdown: stop accepting, drop SSE streams, flush and close SQLite
+  const shutdown = (signal: string) => {
+    console.log(`${signal} received, shutting down...`);
+    clearInterval(purge);
+    db.closeAllSSE();
+    server.close(() => {
+      db.close();
+      process.exit(0);
+    });
+    server.closeAllConnections?.();
+    setTimeout(() => process.exit(1), 10000).unref();
+  };
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
 startServer().catch((err) => {
