@@ -94,17 +94,47 @@ npm run dev
 http://localhost:3000
 ```
 
-### Triển khai Môi trường Sản xuất (Production Build)
+Yêu cầu **Node.js ≥ 20.19** (khuyến nghị 22 hoặc 24). Lần chạy dev đầu tiên, server tạo tài khoản admin `admin@eventhub.vn` và in mật khẩu ngẫu nhiên ra console (chỉ một lần). Dữ liệu mẫu trong mục 4 được nạp tự động khi chạy dev. DB lưu tại `./data/checkin.db`.
 
 ```bash
-# 1. Build ứng dụng
-npm run build
-
-# 2. Chạy ứng dụng production
-npm start
+npm test        # test API: đăng nhập, phân quyền, 5 case check-in, race condition
+npm run lint    # kiểm tra kiểu TypeScript
 ```
 
-Port mặc định: `3000` (hoặc cấu hình qua biến môi trường `PORT`).
+### Triển khai lên VPS (Docker + HTTPS tự động)
+
+Cần: VPS Linux có Docker + Docker Compose, một tên miền trỏ về IP VPS (bản ghi A), cổng 80 và 443 mở. **HTTPS là bắt buộc**, vì trình duyệt chỉ cho phép camera quét QR và cài PWA trên HTTPS.
+
+```bash
+git clone https://github.com/doquanganh/checkinQR.git /opt/checkin && cd /opt/checkin
+cp .env.example .env
+# Sửa .env: DOMAIN, APP_SECRET (openssl rand -hex 32), ADMIN_EMAIL, ADMIN_PASSWORD, SMTP_*
+docker compose up -d --build
+docker compose logs -f app      # chờ dòng "Event Guest & QR Check-in Server running"
+```
+
+Mở `https://<DOMAIN>`, đăng nhập bằng `ADMIN_EMAIL` / `ADMIN_PASSWORD`, rồi vào menu tài khoản (góc phải trên) để **tạo tài khoản staff** cho từng cổng soát vé. Sau khi tạo xong có thể xóa `ADMIN_PASSWORD` khỏi `.env`.
+
+| Biến | Ý nghĩa |
+|---|---|
+| `DOMAIN` | Tên miền công khai (Caddy tự lấy chứng chỉ Let's Encrypt) |
+| `APP_SECRET` | Chuỗi ngẫu nhiên ≥ 32 ký tự, dùng mã hóa mật khẩu SMTP lưu trong DB. **Không đổi sau khi đã cấu hình SMTP**, nếu đổi phải nhập lại mật khẩu SMTP |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Admin đầu tiên, chỉ dùng khi DB chưa có tài khoản nào |
+| `SMTP_*` | Gmail SMTP (App Password 16 ký tự). Cũng có thể nhập trong app: "Cài đặt Email SMTP" |
+| `SEED_SAMPLE_DATA` | `true` để nạp dữ liệu mẫu (mặc định tắt ở production) |
+| `ENABLE_DEMO_TOOLS` | `true` để bật nút reset check-in, tạo 1,000 khách mẫu, test race (mặc định tắt ở production) |
+
+**Cập nhật phiên bản:** `git pull && docker compose up -d --build`. Dữ liệu nằm trong volume `checkin_data` nên không mất khi build lại.
+
+**Sao lưu** (DB là một file SQLite, backup an toàn khi app đang chạy). Thêm vào crontab của VPS:
+
+```bash
+0 2 * * * cd /opt/checkin && docker compose exec -T app node scripts/backup.mjs
+```
+
+Bản sao lưu nằm ở `/data/backups/` trong volume (giữ 14 bản gần nhất, đổi bằng `BACKUP_KEEP`). Nhớ chép định kỳ ra ngoài VPS, ví dụ `docker compose cp app:/data/backups ./backups` rồi `rsync` đi nơi khác. Khôi phục: dừng app, chép file `.db` đè lên `/data/checkin.db`, khởi động lại.
+
+**Chạy không dùng Docker:** `npm ci && npm run build`, rồi `NODE_ENV=production APP_SECRET=... ADMIN_EMAIL=... ADMIN_PASSWORD=... APP_URL=https://<domain> npm start` sau một reverse proxy HTTPS (nginx/Caddy). Đặt `TZ=Asia/Ho_Chi_Minh` để biểu đồ check-in theo giờ đúng múi giờ.
 
 ---
 
@@ -133,12 +163,20 @@ Port mặc định: `3000` (hoặc cấu hình qua biến môi trường `PORT`)
 
 ## 5. Giới hạn đã biết (KNOWN LIMITATIONS)
 
-1. **Email Delivery:** Ở môi trường demo / dev, chức năng gửi email được ghi nhận trạng thái và log trong cơ sở dữ liệu (`SENT`/`PENDING`/`FAILED`). Khi triển khai production doanh nghiệp, cần cấu hình SMTP credentials hoặc dịch vụ gửi email như SendGrid/Resend/AWS SES qua biến môi trường.
-2. **Camera Permission trên iframe/sandbox:** Trên một số trình duyệt khi chạy trong iframe bị giới hạn quyền camera, hệ thống cung cấp sẵn tính năng quét từ tệp ảnh QR hoặc nhập mã khách thủ công để đảm bảo luôn vận hành thông suốt.
+1. **Email Delivery:** Khi chưa cấu hình SMTP, thao tác gửi thư mời không gửi gì và không đổi trạng thái (UI báo cần cấu hình SMTP). Gmail giới hạn khoảng 500 thư/ngày với tài khoản thường (2.000 với Google Workspace); sự kiện lớn hơn nên dùng Resend/SendGrid/AWS SES qua SMTP. Gửi hàng loạt hiện chạy ngay trong một request (giới hạn 5 thư/giây), nên với hàng nghìn khách hãy gửi theo từng đợt.
+2. **Một máy chủ duy nhất:** SQLite và luồng SSE chạy trong một process, không hỗ trợ chạy nhiều bản app song song. Đủ cho 10.000 khách và hàng chục thiết bị quét.
+3. **Camera Permission trên iframe/sandbox:** Trên một số trình duyệt khi chạy trong iframe bị giới hạn quyền camera, hệ thống cung cấp sẵn tính năng quét từ tệp ảnh QR hoặc nhập mã khách thủ công để đảm bảo luôn vận hành thông suốt.
 
 ---
 
 ## 6. Nhật ký thay đổi (CHANGELOG)
+
+### [2.1.0] - 2026-10-08
+- Lưu dữ liệu bền bằng SQLite (WAL, migration tự động); check-in atomic ở tầng DB.
+- Đăng nhập thật (phiên cookie HttpOnly, mật khẩu scrypt), phân quyền ADMIN / CHECKIN_STAFF được kiểm tra ở backend; admin tạo và khóa tài khoản staff trong UI.
+- Token QR sinh bằng CSPRNG; trang vé công khai chỉ mở bằng token, không dùng mã khách tuần tự.
+- Mật khẩu SMTP mã hóa AES-256-GCM trong DB; nội dung email được escape HTML; biến mẫu `{{FULL_NAME}}`... hoạt động đúng; QR trong email scanner đọc được.
+- Docker + Caddy (HTTPS tự động), script backup, test tự động (`npm test`).
 
 ### [2.0.0] - 2026-10-06
 - Bổ sung Fullstack Node.js + Express backend với Vite dev middleware.

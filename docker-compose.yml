@@ -1,0 +1,33 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_URL: https://${DOMAIN}
+    volumes:
+      - checkin_data:/data
+    expose:
+      - "3000"
+    stop_grace_period: 15s
+
+  # Automatic HTTPS (Let's Encrypt). Camera scanning and PWA install require HTTPS.
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  checkin_data:
+  caddy_data:
+  caddy_config:
