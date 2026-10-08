@@ -1,0 +1,10 @@
+{
+  "name": "QR Event Guest & Check-in System",
+  "description": "Production-ready Guest Invitation, QR Code Generator, Mobile PWA Check-in Scanner, and Real-time Analytics System for high-scale events.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+/* Mobile scanner & touch optimizations */
+#qr-reader-container.hidden {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+#qr-reader-container:not(.hidden) {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+#qr-reader-container video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  margin: 0 auto !important;
+  display: block !important;
+  border-radius: 0 !important;
+}
+
+#qr-reader-container img {
+  display: none !important;
+}
+
+#qr-reader-container canvas {
+  display: none !important;
+}
+
+#qr-reader-container__scan_region {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 0 !important;
+}
+
+#qr-shaded-region {
+  display: none !important;
+}
+
+#qr-reader-container__header_message {
+  display: none !important;
+}
+
+/* Touch improvements */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

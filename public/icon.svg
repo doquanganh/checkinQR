@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <!-- QR Outer Border -->
+  <g filter="url(#shadow)" fill="#ffffff">
+    <!-- QR Corner Top-Left -->
+    <rect x="96" y="96" width="104" height="104" rx="16" fill="#ffffff"/>
+    <rect x="116" y="116" width="64" height="64" rx="8" fill="#4f46e5"/>
+    <rect x="132" y="132" width="32" height="32" rx="4" fill="#ffffff"/>
+
+    <!-- QR Corner Top-Right -->
+    <rect x="312" y="96" width="104" height="104" rx="16" fill="#ffffff"/>
+    <rect x="332" y="116" width="64" height="64" rx="8" fill="#4f46e5"/>
+    <rect x="348" y="132" width="32" height="32" rx="4" fill="#ffffff"/>
+
+    <!-- QR Corner Bottom-Left -->
+    <rect x="96" y="312" width="104" height="104" rx="16" fill="#ffffff"/>
+    <rect x="116" y="332" width="64" height="64" rx="8" fill="#4f46e5"/>
+    <rect x="132" y="348" width="32" height="32" rx="4" fill="#ffffff"/>
+
+    <!-- QR Data Elements -->
+    <rect x="232" y="96" width="48" height="48" rx="8" fill="#ffffff"/>
+    <rect x="232" y="176" width="48" height="48" rx="8" fill="#ffffff"/>
+    <rect x="96" y="232" width="48" height="48" rx="8" fill="#ffffff"/>
+    <rect x="176" y="232" width="48" height="48" rx="8" fill="#ffffff"/>
+    <rect x="312" y="232" width="48" height="48" rx="8" fill="#ffffff"/>
+    <rect x="376" y="248" width="40" height="32" rx="6" fill="#ffffff"/>
+    <rect x="232" y="312" width="48" height="104" rx="8" fill="#ffffff"/>
+    <rect x="312" y="312" width="104" height="48" rx="8" fill="#ffffff"/>
+    <rect x="360" y="376" width="56" height="40" rx="8" fill="#ffffff"/>
+
+    <!-- Check-in Badge overlay in center -->
+    <circle cx="256" cy="256" r="44" fill="#10b981"/>
+    <path d="M242 256 L252 266 L272 246" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>
