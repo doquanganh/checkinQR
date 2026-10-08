@@ -144,17 +144,17 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xs overflow-y-auto">
-      <div className="w-full max-w-xl rounded-3xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden my-6">
-        <div className="flex items-center justify-between p-4 px-6 border-b border-slate-800 bg-slate-900">
+      <div className="w-full max-w-xl rounded-3xl bg-surface border border-line shadow-2xl overflow-hidden my-6">
+        <div className="flex items-center justify-between p-4 px-6 border-b border-line bg-surface">
           <div className="flex items-center gap-2">
             <Upload className="w-5 h-5 text-indigo-400" />
-            <span className="font-bold text-sm text-white">
+            <span className="font-bold text-sm text-fg">
               {lang === 'vi' ? 'Import Khách Mời Từ File CSV / Excel' : 'Import Guests from CSV / Excel'}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-xl text-fg-muted hover:text-fg hover:bg-surface-2 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -162,24 +162,24 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
         <div className="p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-300">
+            <label className="text-xs font-bold text-fg">
               {lang === 'vi' ? 'Dán nội dung CSV hoặc Tải tệp lên:' : 'Paste CSV Content or Upload File:'}
             </label>
             <button
               onClick={handleDownloadTemplate}
-              className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
+              className="text-xs text-indigo-400 hover:text-indigo-400 font-semibold flex items-center gap-1"
             >
               <Download className="w-3.5 h-3.5" />
               <span>{lang === 'vi' ? 'Tải file CSV mẫu chuẩn' : 'Download Sample CSV'}</span>
             </button>
           </div>
 
-          <div className="border-2 border-dashed border-slate-700 rounded-2xl p-4 text-center hover:border-indigo-500/50 transition">
+          <div className="border-2 border-dashed border-line rounded-2xl p-4 text-center hover:border-indigo-400/40 transition">
             <input
               type="file"
               accept=".csv,.txt"
               onChange={handleFileUpload}
-              className="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer"
+              className="block w-full text-xs text-fg-muted file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer"
             />
           </div>
 
@@ -188,11 +188,11 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
             value={csvText}
             onChange={(e) => setCsvText(e.target.value)}
             placeholder="FULL_NAME,PHONE,EMAIL,ORGANIZATION,TITLE,NOTES&#10;Nguyễn Văn A,0901234567,a@example.com,BIDV,Trưởng đoàn,&#10;Trần Văn B,0912345678,b@example.com,FPT,Khách mời,"
-            className="w-full rounded-xl bg-slate-950 border border-slate-800 p-3 text-xs font-mono text-slate-200 focus:outline-hidden focus:border-indigo-500"
+            className="w-full rounded-xl bg-canvas border border-line p-3 text-xs font-mono text-fg focus:outline-hidden focus:border-indigo-500"
           />
 
           {importError && (
-            <div className="p-3 rounded-xl bg-rose-950/70 border border-rose-500/40 text-rose-200 text-xs font-semibold">
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-400/40 text-rose-400 text-xs font-semibold">
               {importError}
             </div>
           )}
@@ -212,27 +212,27 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
           {/* Import Summary Results (Section 18) */}
           {summary && (
-            <div className="mt-4 p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 animate-in fade-in">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+            <div className="mt-4 p-4 rounded-2xl bg-surface border border-line space-y-3 animate-in fade-in">
+              <h4 className="text-xs font-bold text-fg uppercase tracking-wider">
                 {lang === 'vi' ? 'Kết Quả Sau Khi Import:' : 'Import Results Summary:'}
               </h4>
 
               <div className="grid grid-cols-4 gap-2 text-center text-xs">
-                <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-                  <div className="text-slate-400 text-[10px]">{lang === 'vi' ? 'Tổng dòng' : 'Total Rows'}</div>
-                  <div className="font-bold text-white text-base">{summary.total_rows}</div>
+                <div className="p-2 rounded-xl bg-surface border border-line">
+                  <div className="text-fg-muted text-xs">{lang === 'vi' ? 'Tổng dòng' : 'Total Rows'}</div>
+                  <div className="font-bold text-fg text-base">{summary.total_rows}</div>
                 </div>
-                <div className="p-2 rounded-xl bg-emerald-950/30 border border-emerald-500/30">
-                  <div className="text-emerald-400 text-[10px]">{lang === 'vi' ? 'Thành công' : 'Success'}</div>
-                  <div className="font-bold text-emerald-300 text-base">{summary.success}</div>
+                <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-400/40">
+                  <div className="text-emerald-400 text-xs">{lang === 'vi' ? 'Thành công' : 'Success'}</div>
+                  <div className="font-bold text-emerald-400 text-base">{summary.success}</div>
                 </div>
-                <div className="p-2 rounded-xl bg-amber-950/30 border border-amber-500/30">
-                  <div className="text-amber-400 text-[10px]">{lang === 'vi' ? 'Trùng lặp' : 'Duplicates'}</div>
-                  <div className="font-bold text-amber-300 text-base">{summary.duplicate}</div>
+                <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-400/40">
+                  <div className="text-amber-400 text-xs">{lang === 'vi' ? 'Trùng lặp' : 'Duplicates'}</div>
+                  <div className="font-bold text-amber-400 text-base">{summary.duplicate}</div>
                 </div>
-                <div className="p-2 rounded-xl bg-rose-950/30 border border-rose-500/30">
-                  <div className="text-rose-400 text-[10px]">{lang === 'vi' ? 'Không hợp lệ' : 'Invalid'}</div>
-                  <div className="font-bold text-rose-300 text-base">{summary.invalid}</div>
+                <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-400/40">
+                  <div className="text-rose-400 text-xs">{lang === 'vi' ? 'Không hợp lệ' : 'Invalid'}</div>
+                  <div className="font-bold text-rose-400 text-base">{summary.invalid}</div>
                 </div>
               </div>
 
@@ -245,7 +245,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
                   </span>
                   <button
                     onClick={handleDownloadErrorReport}
-                    className="text-xs text-rose-300 hover:text-white underline cursor-pointer"
+                    className="text-xs text-rose-400 hover:text-fg underline cursor-pointer"
                   >
                     {lang === 'vi' ? 'Tải báo cáo lỗi (CSV)' : 'Download error report (CSV)'}
                   </button>

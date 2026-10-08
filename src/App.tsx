@@ -12,7 +12,6 @@ import { CheckinScanner } from './components/CheckinScanner.js';
 import { GuestList } from './components/GuestList.js';
 import { EmailTemplateView } from './components/EmailTemplateView.js';
 import { CheckinLogsView } from './components/CheckinLogsView.js';
-import { RaceConditionSimulator } from './components/RaceConditionSimulator.js';
 import { InvitationModal } from './components/InvitationModal.js';
 import { GuestModal } from './components/GuestModal.js';
 import { ImportExportModal } from './components/ImportExportModal.js';
@@ -21,9 +20,11 @@ import { SmtpSettingsModal } from './components/SmtpSettingsModal.js';
 import { PublicTicketView } from './components/PublicTicketView.js';
 import { OfflineIndicator } from './components/OfflineIndicator.js';
 import { BottomNav } from './components/BottomNav.js';
-import { EventSelectModal, UserSelectModal } from './components/SelectModals.js';
+import { EventSelectModal } from './components/SelectModals.js';
+import { AccountModal } from './components/AccountModal.js';
+import { LoginView } from './components/LoginView.js';
 import { useLanguage } from './context/LanguageContext.js';
-import { Sparkles, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 
 export default function App() {
   const { lang, t } = useLanguage();
@@ -34,30 +35,10 @@ export default function App() {
   const [currentEvent, setCurrentEvent] = useState<EventItem | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Available sample users
-  const availableUsers: User[] = [
-    {
-      id: 'usr_admin',
-      name: 'Nguyễn Quản Trị (Admin)',
-      email: 'admin@eventhub.vn',
-      role: 'ADMIN',
-    },
-    {
-      id: 'usr_staff_01',
-      name: 'Trần Nhân Viên (Staff Cổng 1)',
-      email: 'staff01@eventhub.vn',
-      role: 'CHECKIN_STAFF',
-    },
-    {
-      id: 'usr_staff_02',
-      name: 'Lê Soát Vé (Staff Cổng 2)',
-      email: 'staff02@eventhub.vn',
-      role: 'CHECKIN_STAFF',
-    },
-  ];
-
-  const [currentUser, setCurrentUser] = useState<User>(availableUsers[0]);
-  const [activeRole, setActiveRole] = useState<Role>('ADMIN');
+  // Signed-in user comes from the server session; the role is enforced by the API, not by this UI
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const activeRole: Role = currentUser?.role ?? 'CHECKIN_STAFF';
   const [activeTab, setActiveTab] = useState('dashboard');
 
   // Unified Modals state
@@ -76,9 +57,6 @@ export default function App() {
     setGuestListRefreshKey((k) => k + 1);
   };
 
-  // Bulk 1,000 generate loading
-  const [bulkGenerating, setBulkGenerating] = useState(false);
-  const [isConfirmBulkGenerateOpen, setIsConfirmBulkGenerateOpen] = useState(false);
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
 
   const loadEvents = async () => {
@@ -95,41 +73,33 @@ export default function App() {
     }
   };
 
+  // Restore the session on load; a 401 anywhere in the app drops back to the login screen
   useEffect(() => {
-    loadEvents();
+    api.me().then((u) => {
+      setCurrentUser(u);
+      setAuthChecked(true);
+    });
+    const expired = () => setCurrentUser(null);
+    window.addEventListener('auth:expired', expired);
+    return () => window.removeEventListener('auth:expired', expired);
   }, []);
 
-  // When role changes to staff, auto switch to scanner view
-  const handleRoleChange = (role: Role) => {
-    setActiveRole(role);
-    if (role === 'CHECKIN_STAFF' && activeTab !== 'scanner' && activeTab !== 'logs' && activeTab !== 'guests') {
-      setActiveTab('scanner');
+  // Staff land on the scanner; anyone signing in loads their events
+  useEffect(() => {
+    if (!currentUser) return;
+    if (currentUser.role === 'CHECKIN_STAFF') {
+      setActiveTab((tab) => (['scanner', 'logs', 'guests'].includes(tab) ? tab : 'scanner'));
     }
-  };
+    setLoading(true);
+    loadEvents();
+  }, [currentUser?.id]);
 
-  // Bulk 1,000 Generation
-  const handleBulkGenerate = () => {
-    if (!currentEvent) return;
-    setIsConfirmBulkGenerateOpen(true);
-  };
-
-  const executeBulkGenerate = async () => {
-    if (!currentEvent) return;
-    setIsConfirmBulkGenerateOpen(false);
-    setBulkGenerating(true);
-    try {
-      const res = await api.bulkGenerateGuests(currentEvent.id, 1000);
-      setBannerMessage(res.message);
-      setTimeout(() => setBannerMessage(null), 5000);
-      const evts = await api.getEvents();
-      setEvents(evts);
-      triggerGuestListRefresh();
-    } catch (err: any) {
-      setBannerMessage((lang === 'vi' ? 'Lỗi: ' : 'Error: ') + err.message);
-      setTimeout(() => setBannerMessage(null), 5000);
-    } finally {
-      setBulkGenerating(false);
-    }
+  const handleLogout = async () => {
+    await api.logout();
+    setIsUserModalOpen(false);
+    setCurrentEvent(null);
+    setEvents([]);
+    setCurrentUser(null);
   };
 
   // If a public web ticket link was opened (?ticket=CODE), render public ticket pass view
@@ -147,9 +117,17 @@ export default function App() {
     );
   }
 
+  if (!authChecked) {
+    return <div className="min-h-screen bg-canvas" />;
+  }
+
+  if (!currentUser) {
+    return <LoginView onLoggedIn={setCurrentUser} />;
+  }
+
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-canvas text-fg">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent mb-4" />
         <h2 className="text-base font-bold">
           {lang === 'vi'
@@ -161,7 +139,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-canvas text-fg flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Offline Status Banner */}
       <OfflineIndicator />
 
@@ -172,12 +150,9 @@ export default function App() {
         onSelectEvent={(evt) => setCurrentEvent(evt)}
         onCreateEvent={() => setIsCreateEventOpen(true)}
         activeRole={activeRole}
-        onRoleChange={handleRoleChange}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         currentUser={currentUser}
-        onUserChange={setCurrentUser}
-        availableUsers={availableUsers}
         onOpenEventModal={() => setIsEventModalOpen(true)}
         onOpenUserModal={() => setIsUserModalOpen(true)}
         onOpenSmtpModal={() => setIsSmtpModalOpen(true)}
@@ -185,8 +160,8 @@ export default function App() {
 
       {/* Bulk Generated Notification Toast */}
       {bannerMessage && (
-        <div className="bg-emerald-600/90 text-white px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-lg animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-white shrink-0" />
+        <div className="bg-emerald-600/90 text-fg px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-sm animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-fg shrink-0" />
           <span>{bannerMessage}</span>
         </div>
       )}
@@ -200,7 +175,6 @@ export default function App() {
               <Dashboard
                 currentEvent={currentEvent}
                 onNavigateTab={setActiveTab}
-                onOpenBulkGenerate={handleBulkGenerate}
               />
             )}
 
@@ -219,7 +193,6 @@ export default function App() {
                 onOpenEditModal={(eg) => setEditingGuest(eg)}
                 onOpenInvitationModal={(eg) => setInvitationGuest(eg)}
                 onOpenImportModal={() => setIsImportOpen(true)}
-                onOpenBulkGenerate={handleBulkGenerate}
                 onOpenSmtpModal={() => setIsSmtpModalOpen(true)}
               />
             )}
@@ -235,14 +208,9 @@ export default function App() {
 
             {/* Tab: Logs (Audit trail) */}
             {activeTab === 'logs' && <CheckinLogsView currentEvent={currentEvent} />}
-
-            {/* Tab: Race Condition Tester */}
-            {activeTab === 'race-test' && (
-              <RaceConditionSimulator currentEvent={currentEvent} />
-            )}
           </>
         ) : (
-          <div className="text-center py-16 text-slate-400">
+          <div className="text-center py-16 text-fg-muted">
             <p>
               {lang === 'vi'
                 ? 'Chưa có sự kiện nào được chọn. Hãy tạo một sự kiện để bắt đầu!'
@@ -257,7 +225,6 @@ export default function App() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         activeRole={activeRole}
-        onRoleChange={handleRoleChange}
         currentEvent={currentEvent}
         currentUser={currentUser}
         onOpenEventModal={() => setIsEventModalOpen(true)}
@@ -276,15 +243,12 @@ export default function App() {
         isAdmin={activeRole === 'ADMIN'}
       />
 
-      {/* 0.1. User & Role Selector Modal */}
-      <UserSelectModal
+      {/* 0.1. Account modal: profile, password, staff management (admin), sign out */}
+      <AccountModal
         isOpen={isUserModalOpen}
         onClose={() => setIsUserModalOpen(false)}
         currentUser={currentUser}
-        onUserChange={setCurrentUser}
-        activeRole={activeRole}
-        onRoleChange={handleRoleChange}
-        availableUsers={availableUsers}
+        onLogout={handleLogout}
       />
       {/* 1. Add / Edit Guest Modal */}
       {(isAddGuestOpen || editingGuest) && currentEvent && (
@@ -356,67 +320,6 @@ export default function App() {
         onClose={() => setIsSmtpModalOpen(false)}
         onConfigUpdated={triggerGuestListRefresh}
       />
-
-      {/* Bulk Generating Modal Overlay */}
-      {bulkGenerating && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-xs text-white space-y-4">
-          <div className="animate-spin rounded-full h-14 w-14 border-4 border-purple-500 border-t-transparent shadow-2xl" />
-          <div className="text-center">
-            <h3 className="text-lg font-bold">
-              {lang === 'vi'
-                ? 'Đang sinh 1,000 Khách mời & Mã QR Token...'
-                : 'Generating 1,000 Sample Guests & QR Tokens...'}
-            </h3>
-            <p className="text-xs text-slate-400 mt-1">
-              {lang === 'vi'
-                ? 'Đang khởi tạo mã định danh duy nhất và tạo token bảo mật cho từng khách'
-                : 'Initializing unique identifiers and secure QR tokens for each guest'}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Confirmation Modal for Bulk 1,000 Generation */}
-      {isConfirmBulkGenerateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200">
-          <div
-            className="bg-slate-900 border border-purple-500/30 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 shadow-lg">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-base font-bold text-white">
-                  {lang === 'vi' ? 'Sinh 1,000 Khách Mời Mẫu' : 'Generate 1,000 Sample Guests'}
-                </h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  {lang === 'vi'
-                    ? 'Bạn có muốn tạo tự động 1,000 khách mời mẫu (kèm tên, email, cơ quan, mã QR token bảo mật) để kiểm thử hiệu năng và chịu tải sự kiện?'
-                    : 'Do you want to automatically generate 1,000 sample guests (with names, emails, organizations, and secure QR tokens) for event load & performance testing?'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2">
-              <button
-                onClick={() => setIsConfirmBulkGenerateOpen(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition cursor-pointer"
-              >
-                {lang === 'vi' ? 'Hủy' : 'Cancel'}
-              </button>
-              <button
-                onClick={executeBulkGenerate}
-                className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-lg shadow-purple-600/30 transition cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>{lang === 'vi' ? 'Tạo 1,000 Khách' : 'Generate 1,000 Guests'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

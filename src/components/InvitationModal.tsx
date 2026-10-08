@@ -63,7 +63,7 @@ export const InvitationModal: React.FC<InvitationModalProps> = ({
 
   const guest = eventGuest.guest;
   const qrPayload = formatQRPayload(currentEvent.event_code, eventGuest.qr_token);
-  const ticketUrl = `${window.location.origin}/?ticket=${eventGuest.guest_code}`;
+  const ticketUrl = `${window.location.origin}/?ticket=${encodeURIComponent(eventGuest.qr_token)}`;
 
   // Download high-resolution PNG with official card banner
   const handleDownloadQR = () => {
@@ -152,18 +152,18 @@ Ban Tổ Chức ${currentEvent.event_name}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 overflow-y-auto backdrop-blur-xs">
-      <div className="w-full max-w-xl rounded-3xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden my-6">
+      <div className="w-full max-w-xl rounded-3xl bg-surface border border-line shadow-2xl overflow-hidden my-6">
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between p-4 px-6 border-b border-slate-800 bg-slate-900">
+        <div className="flex items-center justify-between p-4 px-6 border-b border-line bg-surface">
           <div className="flex items-center gap-2">
             <QrCode className="w-5 h-5 text-indigo-400" />
-            <span className="font-bold text-sm text-white">
+            <span className="font-bold text-sm text-fg">
               {lang === 'vi' ? 'Thư Mời & Thẻ Khách VIP:' : 'VIP Guest Invitation & Card:'} {eventGuest.guest_code}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-xl text-fg-muted hover:text-fg hover:bg-surface-2 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -173,14 +173,14 @@ Ban Tổ Chức ${currentEvent.event_name}`;
         <div className="p-6 overflow-y-auto max-h-[75vh]">
           <div
             id="invitation-print-area"
-            className="bg-white text-slate-900 rounded-2xl p-6 sm:p-8 shadow-2xl border-4 border-indigo-900/10 relative overflow-hidden"
+            className="bg-white text-slate-900 rounded-2xl p-6 sm:p-8 shadow-2xl border-4 border-carbon/10 relative overflow-hidden"
           >
             {/* Top Ornamental Ribbon */}
-            <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-indigo-700 via-indigo-600 to-cyan-500" />
+            <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-indigo-700 via-indigo-600 to-indigo-500" />
 
             {/* Header */}
             <div className="text-center pb-6 border-b border-slate-200">
-              <span className="text-[11px] font-bold tracking-widest text-indigo-800 uppercase bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200">
+              <span className="text-xs font-bold tracking-widest text-carbon uppercase bg-[#f1fcee] px-3 py-1 rounded-full border border-[#cfeccb]">
                 {t.officialInvitation}
               </span>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-3 tracking-tight">
@@ -197,7 +197,7 @@ Ban Tổ Chức ${currentEvent.event_name}`;
                 <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
                   {t.dearGuest}
                 </div>
-                <div className="text-lg font-black text-indigo-900 truncate">
+                <div className="text-lg font-black text-carbon truncate">
                   {guest?.full_name}
                 </div>
                 <div className="text-xs font-semibold text-slate-700 mt-1 flex items-center gap-2 flex-wrap">
@@ -213,11 +213,11 @@ Ban Tổ Chức ${currentEvent.event_name}`;
 
               {/* Event Time & Venue Info */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 rounded-xl bg-indigo-50/60 border border-indigo-100 flex items-start gap-2.5">
-                  <Calendar className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                <div className="p-3 rounded-xl bg-[#f1fcee] border border-[#cfeccb] flex items-start gap-2.5">
+                  <Calendar className="w-4 h-4 text-[#0b5f5e] shrink-0 mt-0.5" />
                   <div>
                     <div className="font-bold text-slate-800">{t.eventTimeLabel}</div>
-                    <div className="text-slate-600 mt-0.5">
+                    <div className="text-slate-500 mt-0.5">
                       {new Date(currentEvent.start_at).toLocaleTimeString(lang === 'vi' ? 'vi-VN' : 'en-US', {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -227,18 +227,18 @@ Ban Tổ Chức ${currentEvent.event_name}`;
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-indigo-50/60 border border-indigo-100 flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                <div className="p-3 rounded-xl bg-[#f1fcee] border border-[#cfeccb] flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-[#0b5f5e] shrink-0 mt-0.5" />
                   <div>
                     <div className="font-bold text-slate-800">{t.eventLocationLabel}</div>
-                    <div className="text-slate-600 mt-0.5">{currentEvent.location}</div>
+                    <div className="text-slate-500 mt-0.5">{currentEvent.location}</div>
                   </div>
                 </div>
               </div>
 
               {/* QR CHECK-IN SECTION (Section 7 & 8) */}
               <div className="mt-6 pt-6 border-t-2 border-dashed border-slate-300 text-center">
-                <div className="inline-block p-4 rounded-2xl bg-white border-2 border-slate-300 shadow-md">
+                <div className="inline-block p-4 rounded-2xl bg-white border-2 border-slate-300 shadow-sm">
                   <div className="text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">
                     {t.personalQrLabel}
                   </div>
@@ -249,30 +249,30 @@ Ban Tổ Chức ${currentEvent.event_name}`;
                       className="w-48 h-48 mx-auto rounded-lg shadow-xs"
                     />
                   ) : (
-                    <div className="w-48 h-48 flex items-center justify-center text-slate-400">
+                    <div className="w-48 h-48 flex items-center justify-center text-slate-500">
                       {t.generatingQr}
                     </div>
                   )}
-                  <div className="mt-2 font-mono font-bold text-sm text-indigo-900">
+                  <div className="mt-2 font-mono font-bold text-sm text-carbon">
                     {eventGuest.guest_code}
                   </div>
                 </div>
 
-                <p className="text-[11px] text-slate-500 mt-3 max-w-sm mx-auto">
+                <p className="text-xs text-slate-500 mt-3 max-w-sm mx-auto">
                   * {t.showAtGate}
                 </p>
               </div>
             </div>
 
             {/* Footer Sign-off */}
-            <div className="mt-6 pt-4 border-t border-slate-200 flex justify-between items-end text-xs text-slate-600">
+            <div className="mt-6 pt-4 border-t border-slate-200 flex justify-between items-end text-xs text-slate-500">
               <div>
                 <div>{lang === 'vi' ? 'Mã bảo mật' : 'Security Token'}: {eventGuest.qr_token.substring(0, 10)}...</div>
-                <div className="text-[10px] text-slate-400">{lang === 'vi' ? 'Hệ thống EventCheckin Pro' : 'EventCheckin Pro System'}</div>
+                <div className="text-xs text-slate-500">{lang === 'vi' ? 'Hệ thống EventCheckin Pro' : 'EventCheckin Pro System'}</div>
               </div>
               <div className="text-right">
-                <div className="font-bold text-indigo-950 uppercase">{lang === 'vi' ? 'TRƯỞNG BAN TỔ CHỨC' : 'ORGANIZING COMMITTEE'}</div>
-                <div className="text-[11px] text-slate-500 italic mt-6">({lang === 'vi' ? 'Đã ký duyệt' : 'Authorized'})</div>
+                <div className="font-bold text-carbon uppercase">{lang === 'vi' ? 'TRƯỞNG BAN TỔ CHỨC' : 'ORGANIZING COMMITTEE'}</div>
+                <div className="text-xs text-slate-500 italic mt-6">({lang === 'vi' ? 'Đã ký duyệt' : 'Authorized'})</div>
               </div>
             </div>
           </div>
@@ -280,12 +280,12 @@ Ban Tổ Chức ${currentEvent.event_name}`;
           {/* Status feedback banner */}
           {sendResultMsg && (
             <div
-              className={`mt-4 p-3.5 rounded-xl border text-xs font-semibold flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-md animate-in fade-in ${
+              className={`mt-4 p-3.5 rounded-xl border text-xs font-semibold flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-sm animate-in fade-in ${
                 sendResultMsg.type === 'success'
-                  ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200'
+                  ? 'bg-emerald-500/10 border-emerald-400/40 text-emerald-400'
                   : sendResultMsg.type === 'warning'
-                  ? 'bg-amber-950/90 border-amber-500/50 text-amber-200'
-                  : 'bg-rose-950/90 border-rose-500/50 text-rose-200'
+                  ? 'bg-amber-500/10 border-amber-400/40 text-amber-400'
+                  : 'bg-rose-500/10 border-rose-400/40 text-rose-400'
               }`}
             >
               <div className="flex items-start sm:items-center gap-2">
@@ -311,7 +311,7 @@ Ban Tổ Chức ${currentEvent.event_name}`;
                     )}
                     <button
                       onClick={handleOpenGmailWeb}
-                      className="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                      className="px-2.5 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
                     >
                       <ExternalLink className="w-3 h-3" />
                       <span>{lang === 'vi' ? 'Mở Gmail Web' : 'Open Gmail Web'}</span>
@@ -320,7 +320,7 @@ Ban Tổ Chức ${currentEvent.event_name}`;
                 )}
                 <button
                   onClick={() => setSendResultMsg(null)}
-                  className="text-slate-400 hover:text-white p-0.5 rounded cursor-pointer"
+                  className="text-fg-muted hover:text-fg p-0.5 rounded cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -331,11 +331,11 @@ Ban Tổ Chức ${currentEvent.event_name}`;
           {/* Action Toolbar */}
           <div className="mt-5 space-y-3">
             {/* Top row: Utilities (Print, Copy code, Copy Link, Web Gmail) */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800">
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-line">
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={handleDownloadQR}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-sm transition"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>{lang === 'vi' ? 'Tải ảnh QR' : 'Download QR'}</span>
@@ -343,7 +343,7 @@ Ban Tổ Chức ${currentEvent.event_name}`;
 
                 <button
                   onClick={handlePrint}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 text-fg font-semibold text-xs border border-line transition"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>{lang === 'vi' ? 'In thư mời' : 'Print Letter'}</span>
@@ -351,7 +351,7 @@ Ban Tổ Chức ${currentEvent.event_name}`;
 
                 <button
                   onClick={handleCopyTicketLink}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 text-fg font-semibold text-xs border border-line transition"
                   title={ticketUrl}
                 >
                   {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5 text-indigo-400" />}
@@ -360,7 +360,7 @@ Ban Tổ Chức ${currentEvent.event_name}`;
 
                 <button
                   onClick={handleCopyCode}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700 transition"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 text-fg text-xs border border-line transition"
                   title={lang === 'vi' ? 'Sao chép mã khách' : 'Copy guest code'}
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -372,7 +372,7 @@ Ban Tổ Chức ${currentEvent.event_name}`;
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={handleOpenGmailWeb}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-600/90 hover:bg-red-500 text-white font-bold text-xs shadow-md transition"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition"
                   title={lang === 'vi' ? 'Mở cửa sổ soạn thư Gmail cá nhân với mẫu sẵn' : 'Open personal Gmail Web compose'}
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -382,7 +382,7 @@ Ban Tổ Chức ${currentEvent.event_name}`;
                 <button
                   onClick={handleSendEmail}
                   disabled={sending}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white font-bold text-xs shadow-md transition"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs shadow-sm transition"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   <span>
@@ -395,7 +395,7 @@ Ban Tổ Chức ${currentEvent.event_name}`;
             </div>
 
             {/* SMTP Status helper link */}
-            <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+            <div className="flex items-center justify-between text-xs text-fg-muted pt-1">
               <span className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-full ${smtpConfig?.isConfigured ? 'bg-emerald-400' : 'bg-amber-400'}`} />
                 {smtpConfig?.isConfigured
@@ -409,7 +409,7 @@ Ban Tổ Chức ${currentEvent.event_name}`;
               {onOpenSmtpModal && (
                 <button
                   onClick={onOpenSmtpModal}
-                  className="text-indigo-400 hover:text-indigo-300 underline font-medium cursor-pointer"
+                  className="text-indigo-400 hover:text-indigo-400 underline font-medium cursor-pointer"
                 >
                   {lang === 'vi' ? '⚙ Cấu hình máy chủ SMTP' : '⚙ SMTP Settings'}
                 </button>

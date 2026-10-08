@@ -175,18 +175,18 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xs overflow-y-auto">
-      <div className="w-full max-w-2xl rounded-3xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden my-6">
+      <div className="w-full max-w-2xl rounded-3xl bg-surface border border-line shadow-2xl overflow-hidden my-6">
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-4 px-6 border-b border-slate-800 bg-slate-900/90">
+        <div className="flex items-center justify-between p-4 px-6 border-b border-line bg-surface/90">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-400/40 flex items-center justify-center text-indigo-400">
               <Server className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-base text-white">
+              <h3 className="font-bold text-base text-fg">
                 {lang === 'vi' ? 'Cấu Hình Máy Chủ Email (SMTP)' : 'Email Server Settings (SMTP)'}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-fg-muted">
                 {lang === 'vi'
                   ? 'Gửi thư mời kèm mã QR thật vào hộp thư khách mời'
                   : 'Dispatch real invitation emails with QR code tickets'}
@@ -195,7 +195,7 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-xl text-fg-muted hover:text-fg hover:bg-surface-2 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -207,8 +207,8 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
           <div
             className={`p-4 rounded-2xl border flex items-start gap-3 ${
               isConfigured
-                ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-300'
-                : 'bg-amber-950/40 border-amber-500/30 text-amber-300'
+                ? 'bg-emerald-500/10 border-emerald-400/40 text-emerald-400'
+                : 'bg-amber-500/10 border-amber-400/40 text-amber-400'
             }`}
           >
             {isConfigured ? (
@@ -240,40 +240,40 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
 
           {/* Quick Presets */}
           <div>
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-2">
+            <label className="text-xs font-semibold text-fg uppercase tracking-wider block mb-2">
               {lang === 'vi' ? 'Chọn nhanh nhà cung cấp:' : 'Quick Provider Presets:'}
             </label>
             <div className="grid grid-cols-3 gap-2.5">
               <button
                 type="button"
                 onClick={() => handleApplyPreset('gmail')}
-                className="p-2.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-xs font-medium text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5"
+                className="p-2.5 rounded-xl border border-line bg-surface-2/80 hover:bg-indigo-500/10 hover:border-indigo-400/40 text-xs font-medium text-fg hover:text-fg transition flex items-center justify-center gap-1.5"
               >
-                <span className="text-red-400 font-bold">G</span> Gmail / Google
+                <span className="text-rose-400 font-bold">G</span> Gmail / Google
               </button>
               <button
                 type="button"
                 onClick={() => handleApplyPreset('brevo')}
-                className="p-2.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-xs font-medium text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5"
+                className="p-2.5 rounded-xl border border-line bg-surface-2/80 hover:bg-indigo-500/10 hover:border-indigo-400/40 text-xs font-medium text-fg hover:text-fg transition flex items-center justify-center gap-1.5"
               >
-                <span className="text-blue-400 font-bold">B</span> Brevo (Sendinblue)
+                <span className="text-indigo-400 font-bold">B</span> Brevo (Sendinblue)
               </button>
               <button
                 type="button"
                 onClick={() => handleApplyPreset('sendgrid')}
-                className="p-2.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-indigo-600/20 hover:border-indigo-500/50 text-xs font-medium text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5"
+                className="p-2.5 rounded-xl border border-line bg-surface-2/80 hover:bg-indigo-500/10 hover:border-indigo-400/40 text-xs font-medium text-fg hover:text-fg transition flex items-center justify-center gap-1.5"
               >
-                <span className="text-teal-400 font-bold">S</span> SendGrid
+                <span className="text-emerald-400 font-bold">S</span> SendGrid
               </button>
             </div>
           </div>
 
           {/* Gmail App Password Instruction Guide */}
-          <div className="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-4 text-xs text-slate-300">
+          <div className="bg-surface-2/70 border border-line/80 rounded-2xl p-4 text-xs text-fg">
             <button
               type="button"
               onClick={() => setShowGuide(!showGuide)}
-              className="w-full flex items-center justify-between text-indigo-400 font-semibold hover:text-indigo-300"
+              className="w-full flex items-center justify-between text-indigo-400 font-semibold hover:text-indigo-400"
             >
               <span className="flex items-center gap-1.5">
                 <HelpCircle className="w-4 h-4" />
@@ -284,7 +284,7 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
               <span>{showGuide ? '▲ Đóng' : '▼ Xem chi tiết'}</span>
             </button>
             {showGuide && (
-              <div className="mt-3 pt-3 border-t border-slate-700 space-y-2 text-slate-300 leading-relaxed">
+              <div className="mt-3 pt-3 border-t border-line space-y-2 text-fg leading-relaxed">
                 <p>
                   1. Đăng nhập tài khoản Google của bạn tại{' '}
                   <a
@@ -324,7 +324,7 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
           <form onSubmit={handleSave} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-fg mb-1">
                   {lang === 'vi' ? 'Máy chủ SMTP (Host):' : 'SMTP Host:'}
                 </label>
                 <input
@@ -332,13 +332,13 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
                   value={host}
                   onChange={(e) => setHost(e.target.value)}
                   placeholder="smtp.gmail.com"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-surface-2 border border-line rounded-xl px-3.5 py-2 text-sm text-fg focus:outline-none focus:border-indigo-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-fg mb-1">
                   {lang === 'vi' ? 'Cổng (Port):' : 'Port:'}
                 </label>
                 <div className="flex gap-2 items-center">
@@ -347,15 +347,15 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
                     value={port}
                     onChange={(e) => setPort(Number(e.target.value))}
                     placeholder="465"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-surface-2 border border-line rounded-xl px-3.5 py-2 text-sm text-fg focus:outline-none focus:border-indigo-500"
                     required
                   />
-                  <label className="flex items-center gap-1.5 text-xs text-slate-300 shrink-0 cursor-pointer">
+                  <label className="flex items-center gap-1.5 text-xs text-fg shrink-0 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={secure}
                       onChange={(e) => setSecure(e.target.checked)}
-                      className="rounded border-slate-700 text-indigo-600 focus:ring-0"
+                      className="rounded border-line text-indigo-600 focus:ring-0"
                     />
                     SSL/TLS
                   </label>
@@ -365,7 +365,7 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-fg mb-1">
                   {lang === 'vi' ? 'Tài khoản / Email đăng nhập:' : 'Username / Email:'}
                 </label>
                 <div className="relative">
@@ -377,15 +377,15 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
                       if (!fromEmail) setFromEmail(e.target.value);
                     }}
                     placeholder="ban_to_chuc@gmail.com"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-surface-2 border border-line rounded-xl pl-9 pr-3.5 py-2 text-sm text-fg focus:outline-none focus:border-indigo-500"
                     required
                   />
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  <Mail className="w-4 h-4 text-fg-muted absolute left-3 top-2.5" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-fg mb-1">
                   {lang === 'vi' ? 'Mật khẩu ứng dụng (App Password):' : 'App Password:'}
                 </label>
                 <div className="relative">
@@ -394,16 +394,16 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
                     value={pass}
                     onChange={(e) => setPass(e.target.value)}
                     placeholder={isConfigured ? '•••••••••••••••• (Đã lưu)' : '16 ký tự mã ứng dụng'}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-surface-2 border border-line rounded-xl pl-9 pr-3.5 py-2 text-sm text-fg focus:outline-none focus:border-indigo-500"
                   />
-                  <Key className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  <Key className="w-4 h-4 text-fg-muted absolute left-3 top-2.5" />
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-fg mb-1">
                   {lang === 'vi' ? 'Tên hiển thị người gửi:' : 'Sender Display Name:'}
                 </label>
                 <input
@@ -411,12 +411,12 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
                   value={fromName}
                   onChange={(e) => setFromName(e.target.value)}
                   placeholder="Ban Tổ Chức Sự Kiện"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-surface-2 border border-line rounded-xl px-3.5 py-2 text-sm text-fg focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-fg mb-1">
                   {lang === 'vi' ? 'Email người gửi (From Email):' : 'From Email Address:'}
                 </label>
                 <input
@@ -424,7 +424,7 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
                   value={fromEmail}
                   onChange={(e) => setFromEmail(e.target.value)}
                   placeholder={user || 'noreply@domain.com'}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-surface-2 border border-line rounded-xl px-3.5 py-2 text-sm text-fg focus:outline-none focus:border-indigo-500"
                 />
               </div>
             </div>
@@ -434,8 +434,8 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
               <div
                 className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
                   verifyNotice.type === 'success'
-                    ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-300'
-                    : 'bg-rose-950/60 border border-rose-500/40 text-rose-300'
+                    ? 'bg-emerald-500/10 border border-emerald-400/40 text-emerald-400'
+                    : 'bg-rose-500/10 border border-rose-400/40 text-rose-400'
                 }`}
               >
                 {verifyNotice.type === 'success' ? (
@@ -462,7 +462,7 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
                 type="button"
                 onClick={handleVerify}
                 disabled={verifying || saving}
-                className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2.5 px-4 rounded-xl text-sm border border-slate-700 transition flex items-center gap-1.5 disabled:opacity-50"
+                className="bg-surface-2 hover:bg-surface-3 text-fg font-medium py-2.5 px-4 rounded-xl text-sm border border-line transition flex items-center gap-1.5 disabled:opacity-50"
               >
                 {verifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4 text-emerald-400" />}
                 {lang === 'vi' ? 'Kiểm Tra Kết Nối' : 'Test Connection'}
@@ -471,8 +471,8 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
           </form>
 
           {/* Test Email Dispatch Section */}
-          <div className="pt-4 border-t border-slate-800">
-            <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <div className="pt-4 border-t border-line">
+            <h4 className="text-xs font-bold text-fg uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <Send className="w-3.5 h-3.5 text-indigo-400" />
               {lang === 'vi' ? 'Gửi Email Thử Nghiệm Ngay Đến Hộp Thư:' : 'Send Live Test Email:'}
             </h4>
@@ -482,13 +482,13 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
                 value={testEmailTarget}
                 onChange={(e) => setTestEmailTarget(e.target.value)}
                 placeholder="nhap_email_cua_ban@gmail.com"
-                className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                className="flex-1 bg-surface-2 border border-line rounded-xl px-3.5 py-2 text-sm text-fg focus:outline-none focus:border-indigo-500"
               />
               <button
                 type="button"
                 onClick={handleSendTest}
                 disabled={sendingTest || !testEmailTarget}
-                className="bg-purple-600 hover:bg-purple-500 text-white font-medium py-2 px-4 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 disabled:opacity-50 shrink-0"
+                className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-4 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 disabled:opacity-50 shrink-0"
               >
                 {sendingTest ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 {lang === 'vi' ? 'Gửi Thử' : 'Send Test'}
@@ -499,8 +499,8 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
               <div
                 className={`mt-2.5 p-3 rounded-xl text-xs flex items-center gap-2 ${
                   testNotice.type === 'success'
-                    ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-300'
-                    : 'bg-rose-950/60 border border-rose-500/40 text-rose-300'
+                    ? 'bg-emerald-500/10 border border-emerald-400/40 text-emerald-400'
+                    : 'bg-rose-500/10 border border-rose-400/40 text-rose-400'
                 }`}
               >
                 {testNotice.type === 'success' ? (
@@ -515,10 +515,10 @@ export const SmtpSettingsModal: React.FC<SmtpSettingsModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 px-6 border-t border-slate-800 bg-slate-900/90 flex justify-end">
+        <div className="p-4 px-6 border-t border-line bg-surface/90 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition"
+            className="px-5 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 text-fg text-sm font-medium transition"
           >
             {lang === 'vi' ? 'Đóng' : 'Close'}
           </button>

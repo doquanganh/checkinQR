@@ -32,15 +32,15 @@ export const OfflineIndicator: React.FC = () => {
   if (isOnline && offlineQueueCount === 0) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2.5 rounded-xl bg-amber-600/95 backdrop-blur-md px-4 py-2 text-xs font-semibold text-white shadow-xl border border-amber-400/30">
+    <div className="fixed bottom-4 left-4 z-50 flex items-center gap-2.5 rounded-xl bg-amber-600/95 backdrop-blur-md px-4 py-2 text-xs font-semibold text-fg shadow-sm border border-amber-400/30">
       {!isOnline ? (
         <>
-          <WifiOff className="w-4 h-4 text-amber-200 animate-pulse" />
+          <WifiOff className="w-4 h-4 text-amber-400 animate-pulse" />
           <span>{t.offlineBanner}</span>
         </>
       ) : (
         <>
-          <RefreshCw className={`w-4 h-4 text-white ${syncing ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 text-fg ${syncing ? 'animate-spin' : ''}`} />
           <span>
             {lang === 'vi'
               ? `Đang đồng bộ ${offlineQueueCount} lượt check-in offline lên server...`

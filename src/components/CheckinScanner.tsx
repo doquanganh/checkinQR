@@ -5,6 +5,7 @@ import { EventItem, CheckinResponse, User } from '../types/index.js';
 import { api } from '../services/api.js';
 import { feedback } from '../utils/feedback.js';
 import { useLanguage } from '../context/LanguageContext.js';
+import { resultLabel } from '../utils/resultLabel.js';
 import {
   Camera,
   CameraOff,
@@ -201,10 +202,10 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
       <div id="qr-temp-reader" className="hidden" />
 
       {/* Checkin Top Bar Controls */}
-      <div className="w-full flex items-center justify-between bg-slate-900/90 border border-slate-800 rounded-2xl p-3 px-4 shadow-lg gap-2">
+      <div className="w-full flex items-center justify-between bg-surface/90 border border-line rounded-2xl p-3 px-4 shadow-sm gap-2">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-          <span className="text-xs sm:text-sm font-bold text-white truncate min-w-0">
+          <span className="text-xs sm:text-sm font-bold text-fg truncate min-w-0">
             {t.gateLabel}: <strong className="text-emerald-400 font-bold">{currentUser.name}</strong>
           </span>
         </div>
@@ -214,8 +215,8 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
             onClick={() => setSoundEnabled(!soundEnabled)}
             className={`p-2 rounded-xl border text-xs font-medium transition cursor-pointer ${
               soundEnabled
-                ? 'bg-slate-800 border-slate-700 text-slate-200'
-                : 'bg-rose-950/40 border-rose-500/40 text-rose-300'
+                ? 'bg-surface-2 border-line text-fg'
+                : 'bg-rose-500/10 border-rose-400/40 text-rose-400'
             }`}
             title={soundEnabled ? t.soundOff : t.soundOn}
           >
@@ -225,7 +226,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
           {scannerActive && (
             <button
               onClick={toggleFacingMode}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs transition cursor-pointer"
+              className="p-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-line text-fg text-xs transition cursor-pointer"
               title={t.flipCamera}
             >
               <SwitchCamera className="w-4 h-4 text-indigo-400" />
@@ -235,7 +236,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
       </div>
 
       {/* Main Viewfinder / Scanner Area */}
-      <div className="w-full rounded-2xl sm:rounded-3xl bg-slate-900 border-2 border-slate-800 overflow-hidden shadow-2xl relative">
+      <div className="w-full rounded-2xl sm:rounded-3xl bg-surface border-2 border-line overflow-hidden shadow-2xl relative">
         {/* Camera Video Viewfinder */}
         <div className="relative w-full min-h-[340px] xs:min-h-[380px] sm:min-h-[440px] flex items-center justify-center bg-black overflow-hidden">
           <div
@@ -257,7 +258,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
                 {/* Center scan beam */}
                 <div className="absolute left-2 right-2 top-1/2 -translate-y-1/2 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-pulse" />
                 <div className="absolute bottom-3 left-0 right-0 text-center">
-                  <span className="text-[11px] font-bold text-white bg-black/75 px-3 py-1 rounded-full border border-emerald-400/30 shadow-md">
+                  <span className="text-xs font-bold text-white bg-black/75 px-3 py-1 rounded-full border border-emerald-400/30 shadow-sm">
                     {t.alignQrInstruction}
                   </span>
                 </div>
@@ -267,25 +268,25 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
 
           {!scannerActive && (
             <div className="w-full max-w-sm mx-auto flex flex-col items-center justify-center text-center p-4 sm:p-6 space-y-4">
-              <div className="w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mx-auto text-indigo-400 shadow-xl">
+              <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-400/40 flex items-center justify-center mx-auto text-indigo-400 shadow-sm">
                 <Camera className="w-8 h-8" />
               </div>
               <div className="text-center">
                 <h3 className="text-base font-bold text-white">{t.cameraReady}</h3>
-                <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+                <p className="text-xs text-white/70 mt-1 max-w-xs mx-auto">
                   {t.cameraReadyDesc}
                 </p>
               </div>
 
               {cameraError && (
-                <div className="w-full p-3 rounded-xl bg-amber-950/50 border border-amber-500/40 text-amber-200 text-xs text-left">
+                <div className="w-full p-3 rounded-xl bg-amber-500/10 border border-amber-400/40 text-amber-400 text-xs text-left">
                   {cameraError}
                 </div>
               )}
 
               <button
                 onClick={startCamera}
-                className="w-full max-w-xs mx-auto flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-sm sm:text-base shadow-xl shadow-emerald-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                className="w-full max-w-xs mx-auto flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-sm sm:text-base shadow-xl shadow-emerald-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
               >
                 <Camera className="w-5 h-5" />
                 <span>{t.btnStartCamera}</span>
@@ -297,7 +298,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
               <button
                 onClick={stopCamera}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white text-xs font-semibold shadow-lg transition cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white text-xs font-semibold shadow-sm transition cursor-pointer"
               >
                 <CameraOff className="w-4 h-4 text-rose-400" />
                 <span>{t.btnStopCamera}</span>
@@ -309,7 +310,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
         {/* Processing Indicator Overlay */}
         {processing && (
           <div className="absolute inset-0 z-30 bg-black/60 backdrop-blur-xs flex flex-col items-center justify-center text-white space-y-3">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-400 border-t-transparent shadow-xl" />
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-400 border-t-transparent shadow-sm" />
             <p className="text-sm font-bold tracking-wide animate-pulse">
               {t.verifyingTicket}
             </p>
@@ -317,98 +318,96 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
         )}
       </div>
 
-      {/* SCAN RESULT BANNER (Sections 11 & 12) */}
-      {lastResult && (
-        <div
-          className={`rounded-2xl p-5 shadow-2xl border transition-all duration-300 animate-in fade-in slide-in-from-top-4 ${
-            lastResult.status === 'SUCCESS'
-              ? 'bg-gradient-to-br from-emerald-950/90 via-slate-900 to-emerald-950/40 border-emerald-500/50 text-emerald-100'
-              : lastResult.status === 'ALREADY_CHECKED_IN'
-              ? 'bg-gradient-to-br from-amber-950/90 via-slate-900 to-amber-950/40 border-amber-500/50 text-amber-100'
-              : 'bg-gradient-to-br from-rose-950/90 via-slate-900 to-rose-950/40 border-rose-500/50 text-rose-100'
-          }`}
-        >
-          <div className="flex items-start gap-4">
-            <div className="shrink-0 mt-0.5">
-              {lastResult.status === 'SUCCESS' ? (
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg">
-                  <CheckCircle2 className="w-7 h-7" />
-                </div>
-              ) : lastResult.status === 'ALREADY_CHECKED_IN' ? (
-                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg">
-                  <AlertTriangle className="w-7 h-7" />
-                </div>
-              ) : (
-                <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shadow-lg">
-                  <XCircle className="w-7 h-7" />
-                </div>
-              )}
-            </div>
+      {/* SCAN RESULT: one solid colour, readable at arm's length */}
+      {lastResult && (() => {
+        const ok = lastResult.status === 'SUCCESS';
+        const dup = lastResult.status === 'ALREADY_CHECKED_IN';
+        const vi = lang === 'vi';
+        const labels: Record<string, string> = vi
+          ? {
+              SUCCESS: 'Check-in thành công',
+              ALREADY_CHECKED_IN: 'Đã check-in trước đó',
+              INVALID_QR: 'Mã QR không hợp lệ',
+              WRONG_EVENT: 'Vé của sự kiện khác',
+              GUEST_INACTIVE: 'Vé đã bị khóa',
+              ERROR: 'Lỗi',
+            }
+          : {
+              SUCCESS: 'Checked in',
+              ALREADY_CHECKED_IN: 'Already checked in',
+              INVALID_QR: 'Invalid QR code',
+              WRONG_EVENT: 'Ticket for another event',
+              GUEST_INACTIVE: 'Ticket revoked',
+              ERROR: 'Error',
+            };
+        const tone = ok
+          ? 'bg-emerald-600 text-white'
+          : dup
+          ? 'bg-[#fbbf24] text-[#2b1d00]'
+          : 'bg-rose-600 text-white';
+        const Icon = ok ? CheckCircle2 : dup ? AlertTriangle : XCircle;
+        const locale = vi ? 'vi-VN' : 'en-US';
 
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`px-2 py-0.5 rounded text-[11px] font-black tracking-wider uppercase ${
-                    lastResult.status === 'SUCCESS'
-                      ? 'bg-emerald-500 text-slate-950'
-                      : lastResult.status === 'ALREADY_CHECKED_IN'
-                      ? 'bg-amber-500 text-slate-950'
-                      : 'bg-rose-500 text-white'
-                  }`}
-                >
-                  {lastResult.status}
-                </span>
-                {lastResult.duration_ms && (
-                  <span className="text-[10px] text-slate-400 font-mono">
-                    {lastResult.duration_ms}ms
-                  </span>
-                )}
-              </div>
-
-              {/* Guest Profile Details */}
-              {lastResult.guest ? (
-                <div className="mt-2 space-y-1">
-                  <h4 className="text-xl font-black text-white tracking-tight truncate">
-                    {lastResult.guest.name}
-                  </h4>
-                  <div className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                    <span className="truncate">{lastResult.guest.organization}</span>
-                    <span className="text-slate-400">•</span>
-                    <span className="text-slate-400 truncate">{lastResult.guest.title}</span>
+        return (
+          <div
+            role="status"
+            aria-live="assertive"
+            className={`rounded-2xl p-5 sm:p-6 shadow-md animate-in fade-in slide-in-from-top-4 ${tone}`}
+          >
+            <div className="flex items-start gap-4">
+              <Icon className="w-12 h-12 shrink-0" aria-hidden="true" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm font-extrabold tracking-wide uppercase">
+                    {labels[lastResult.status] || lastResult.status}
                   </div>
-                  <div className="text-xs text-slate-400 font-mono">
-                    {t.guestCodeLabel}: <strong className="text-white">{lastResult.guest.code}</strong>
-                  </div>
+                  {lastResult.duration_ms ? (
+                    <span className="text-xs font-mono opacity-80">{lastResult.duration_ms}ms</span>
+                  ) : null}
                 </div>
-              ) : (
-                <p className="text-sm font-bold text-white mt-2">{lastResult.message}</p>
-              )}
 
-              {/* Audit Time and Staff details */}
-              <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between text-xs text-slate-300 gap-2">
-                {lastResult.checked_in_at ? (
-                  <span>
-                    {t.timeLabel}:{' '}
-                    <strong>{new Date(lastResult.checked_in_at).toLocaleTimeString(lang === 'vi' ? 'vi-VN' : 'en-US')}</strong> (
-                    {new Date(lastResult.checked_in_at).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')})
-                  </span>
+                {lastResult.guest ? (
+                  <div className="mt-1">
+                    <h4 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight break-words">
+                      {lastResult.guest.name}
+                    </h4>
+                    <div className="mt-1 text-base font-semibold">
+                      {lastResult.guest.organization}
+                      {lastResult.guest.title ? ` • ${lastResult.guest.title}` : ''}
+                    </div>
+                    <div className="mt-1 text-sm font-mono opacity-90">
+                      {t.guestCodeLabel}: <strong>{lastResult.guest.code}</strong>
+                    </div>
+                  </div>
                 ) : (
-                  <span>{lastResult.message}</span>
+                  <p className="text-lg font-bold mt-1">{lastResult.message.replace(/^[^A-Za-zÀ-ỹ]*[A-Z][A-Z _]*:\s*/u, '')}</p>
                 )}
-                {lastResult.checked_in_by && (
-                  <span className="text-slate-400">
-                    {t.byStaffLabel}: <strong className="text-slate-200">{lastResult.checked_in_by}</strong>
-                  </span>
+
+                {(lastResult.checked_in_at || lastResult.checked_in_by) && (
+                  <div className="mt-3 pt-3 border-t border-current/25 flex flex-wrap items-center justify-between gap-2 text-sm">
+                    {lastResult.checked_in_at && (
+                      <span>
+                        {t.timeLabel}:{' '}
+                        <strong>{new Date(lastResult.checked_in_at).toLocaleTimeString(locale)}</strong> (
+                        {new Date(lastResult.checked_in_at).toLocaleDateString(locale)})
+                      </span>
+                    )}
+                    {lastResult.checked_in_by && (
+                      <span>
+                        {t.byStaffLabel}: <strong>{lastResult.checked_in_by}</strong>
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Manual Code Input & Quick Test Buttons */}
-      <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-4 shadow-lg space-y-3">
-        <h4 className="text-xs font-bold text-slate-300 flex items-center gap-1.5 uppercase tracking-wider">
+      <div className="rounded-2xl bg-surface/90 border border-line p-4 shadow-sm space-y-3">
+        <h4 className="text-xs font-bold text-fg flex items-center gap-1.5 uppercase tracking-wider">
           <Search className="w-3.5 h-3.5 text-indigo-400" /> {t.manualInputDesc}
         </h4>
 
@@ -424,107 +423,58 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
             value={manualCode}
             onChange={(e) => setManualCode(e.target.value)}
             placeholder={t.manualPlaceholder}
-            className="flex-1 rounded-xl bg-slate-900 border border-slate-700 px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="flex-1 rounded-xl bg-surface border border-line px-3.5 py-2.5 text-sm text-fg placeholder-slate-500 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
           />
           <button
             type="submit"
             disabled={!manualCode.trim() || processing}
-            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-sm shadow-md transition cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-sm shadow-sm transition cursor-pointer"
           >
             {t.btnConfirm}
           </button>
         </form>
 
         {/* Quick Demo Test Buttons */}
-        <div className="pt-2 border-t border-slate-800">
-          <div className="text-[11px] font-semibold text-slate-400 mb-2 flex items-center justify-between">
-            <span>{t.demoTestCases}</span>
-            <label className="cursor-pointer text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+        <div className="pt-2 border-t border-line">
+          <div className="text-xs font-semibold text-fg-muted mb-2 flex items-center justify-between">
+            <span />
+            <label className="cursor-pointer text-indigo-400 hover:text-indigo-400 flex items-center gap-1">
               <Upload className="w-3 h-3" />
               <span>{t.scanFromImage}</span>
               <input type="file" accept="image/*" onChange={handleFileScan} className="hidden" />
             </label>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            <button
-              onClick={() => handleScannedCode('G202600001')}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left text-[11px] transition"
-            >
-              <div className="font-bold text-emerald-400">{t.demoGuest1Valid}</div>
-              <div className="text-slate-400 truncate">Nguyễn Quang Anh</div>
-            </button>
-
-            <button
-              onClick={() => handleScannedCode('G202600002')}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left text-[11px] transition"
-            >
-              <div className="font-bold text-emerald-400">{t.demoGuest2Valid}</div>
-              <div className="text-slate-400 truncate">Nguyễn Ngọc Anh</div>
-            </button>
-
-            <button
-              onClick={() => handleScannedCode('G202600001')}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-amber-500/40 text-left text-[11px] transition"
-            >
-              <div className="font-bold text-amber-400">{t.demoGuest1Duplicate}</div>
-              <div className="text-slate-400 truncate">Test ALREADY CHECKED</div>
-            </button>
-
-            <button
-              onClick={() => handleScannedCode('QR_INVALID_RANDOM_XYZ')}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-rose-500/40 text-left text-[11px] transition"
-            >
-              <div className="font-bold text-rose-400">{t.demoInvalidQr}</div>
-              <div className="text-slate-400 truncate">Test INVALID_QR</div>
-            </button>
-
-            <button
-              onClick={() => handleScannedCode('GTECH00001')}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-rose-500/40 text-left text-[11px] transition"
-            >
-              <div className="font-bold text-rose-400">{t.demoWrongEvent}</div>
-              <div className="text-slate-400 truncate">Test WRONG_EVENT</div>
-            </button>
-
-            <button
-              onClick={() => handleScannedCode('G202600007')}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-rose-500/40 text-left text-[11px] transition"
-            >
-              <div className="font-bold text-rose-400">{t.demoLockedGuest}</div>
-              <div className="text-slate-400 truncate">Test GUEST_INACTIVE</div>
-            </button>
           </div>
         </div>
       </div>
 
       {/* Recent scans on this device */}
       {scanHistory.length > 0 && (
-        <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-4 shadow-lg">
-          <h4 className="text-xs font-bold text-slate-300 flex items-center gap-1.5 uppercase tracking-wider mb-3">
+        <div className="rounded-2xl bg-surface/90 border border-line p-4 shadow-sm">
+          <h4 className="text-xs font-bold text-fg flex items-center gap-1.5 uppercase tracking-wider mb-3">
             <History className="w-3.5 h-3.5 text-indigo-400" /> {t.recentScansTitle}
           </h4>
           <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
             {scanHistory.map((h, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800 text-xs"
+                className="flex items-center justify-between p-2 rounded-xl bg-surface border border-line text-xs"
               >
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] text-slate-500">{h.scannedAt}</span>
-                  <span className="font-bold text-white">
-                    {h.result.guest?.name || t.codePrefix + h.result.status}
+                  <span className="font-mono text-xs text-fg-subtle">{h.scannedAt}</span>
+                  <span className="font-bold text-fg">
+                    {h.result.guest?.name || t.codePrefix + resultLabel(h.result.status, lang)}
                   </span>
                 </div>
                 <span
-                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                  className={`px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 ${
                     h.result.status === 'SUCCESS'
-                      ? 'bg-emerald-500/20 text-emerald-300'
+                      ? 'bg-emerald-500/10 text-emerald-400'
                       : h.result.status === 'ALREADY_CHECKED_IN'
-                      ? 'bg-amber-500/20 text-amber-300'
-                      : 'bg-rose-500/20 text-rose-300'
+                      ? 'bg-amber-500/10 text-amber-400'
+                      : 'bg-rose-500/10 text-rose-400'
                   }`}
                 >
-                  {h.result.status}
+                  {resultLabel(h.result.status, lang)}
                 </span>
               </div>
             ))}

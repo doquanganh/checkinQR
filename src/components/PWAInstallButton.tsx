@@ -30,7 +30,7 @@ export const PWAInstallButton: React.FC = () => {
       <>
         <button
           onClick={() => setShowIOSGuide(true)}
-          className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300 transition cursor-pointer"
+          className="flex items-center gap-1.5 rounded-lg border border-line bg-surface-2 hover:bg-surface-3 px-3 py-1.5 text-xs font-medium text-fg transition cursor-pointer"
           title={t.installIos}
         >
           <Smartphone className="w-3.5 h-3.5 text-indigo-400" />
@@ -39,19 +39,19 @@ export const PWAInstallButton: React.FC = () => {
 
         {showIOSGuide && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
-            <div className="w-full max-w-sm rounded-2xl bg-slate-900 p-6 shadow-2xl border border-slate-700 text-slate-100">
+            <div className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-2xl border border-line text-fg">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <h3 className="text-base font-bold text-fg flex items-center gap-2">
                   <Smartphone className="w-5 h-5 text-indigo-400" /> {t.iosModalTitle}
                 </h3>
                 <button
                   onClick={() => setShowIOSGuide(false)}
-                  className="text-slate-400 hover:text-white p-1 rounded-lg cursor-pointer"
+                  className="text-fg-muted hover:text-fg p-1 rounded-lg cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-sm text-slate-300 leading-relaxed mb-4">
+              <p className="text-sm text-fg leading-relaxed mb-4">
                 {t.iosStep1}<br />
                 {t.iosStep2}<br />
                 {t.iosStep3}

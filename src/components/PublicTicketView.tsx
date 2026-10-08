@@ -67,9 +67,9 @@ export const PublicTicketView: React.FC<PublicTicketViewProps> = ({ ticketCode, 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-white">
+      <div className="min-h-screen bg-canvas flex flex-col items-center justify-center p-4 text-fg">
         <Loader2 className="w-10 h-10 animate-spin text-indigo-500 mb-4" />
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-fg-muted">
           {lang === 'vi' ? 'Đang tải vé điện tử...' : 'Loading digital ticket...'}
         </p>
       </div>
@@ -78,15 +78,15 @@ export const PublicTicketView: React.FC<PublicTicketViewProps> = ({ ticketCode, 
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-white">
-        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
+      <div className="min-h-screen bg-canvas flex flex-col items-center justify-center p-4 text-fg">
+        <div className="max-w-md w-full bg-surface border border-line rounded-3xl p-8 text-center space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto">
             <AlertCircle className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-fg">
             {lang === 'vi' ? 'Không Tìm Thấy Vé' : 'Ticket Not Found'}
           </h2>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-fg-muted">
             {error || (lang === 'vi' ? 'Mã vé không tồn tại hoặc đã bị hủy.' : 'Ticket does not exist.')}
           </p>
           <button
@@ -106,28 +106,28 @@ export const PublicTicketView: React.FC<PublicTicketViewProps> = ({ ticketCode, 
   const isCheckedIn = eventGuest.checkin_status === 'CHECKED_IN';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950 text-white py-8 px-4 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-canvas text-fg py-8 px-4 flex flex-col items-center justify-center">
       <div className="max-w-md w-full space-y-4">
         {/* Navigation Bar */}
         <div className="flex items-center justify-between px-2">
           <button
             onClick={onBackToApp}
-            className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition py-1"
+            className="text-xs text-fg-muted hover:text-fg flex items-center gap-1.5 transition py-1"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>{lang === 'vi' ? 'Quay lại hệ thống' : 'Back to App'}</span>
           </button>
 
-          <span className="text-[11px] font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-0.5 rounded-full">
+          <span className="text-xs font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-400/40 px-2.5 py-0.5 rounded-full">
             {event.event_code}
           </span>
         </div>
 
         {/* Digital Ticket Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative">
+        <div className="bg-surface border border-line rounded-3xl overflow-hidden shadow-2xl relative">
           {/* Header Banner */}
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-center text-white relative">
-            <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-xs rounded-full text-[11px] font-bold uppercase tracking-wider mb-2">
+          <div className="bg-indigo-600 p-6 text-center text-white relative">
+            <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-xs rounded-full text-xs font-bold uppercase tracking-wider mb-2">
               {lang === 'vi' ? 'VÉ CHECK-IN ĐIỆN TỬ' : 'DIGITAL EVENT PASS'}
             </span>
             <h1 className="text-xl sm:text-2xl font-black leading-tight">{event.event_name}</h1>
@@ -136,29 +136,29 @@ export const PublicTicketView: React.FC<PublicTicketViewProps> = ({ ticketCode, 
           {/* Ticket Body */}
           <div className="p-6 space-y-5">
             {/* Guest Details */}
-            <div className="text-center pb-4 border-b border-slate-800">
-              <h2 className="text-2xl font-black text-white">{guest?.full_name || 'Khách mời'}</h2>
+            <div className="text-center pb-4 border-b border-line">
+              <h2 className="text-2xl font-black text-fg">{guest?.full_name || 'Khách mời'}</h2>
               {guest?.organization && (
                 <p className="text-sm font-semibold text-indigo-400 mt-1">
                   {guest?.title ? `${guest.title} • ` : ''}
                   {guest.organization}
                 </p>
               )}
-              <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-slate-800 rounded-full text-xs font-mono text-slate-300 border border-slate-700">
+              <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-surface-2 rounded-full text-xs font-mono text-fg border border-line">
                 <span>{lang === 'vi' ? 'Mã vé:' : 'Code:'}</span>
-                <strong className="text-white">{eventGuest.guest_code}</strong>
+                <strong className="text-fg">{eventGuest.guest_code}</strong>
               </div>
             </div>
 
             {/* Event Time & Venue */}
-            <div className="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-4 space-y-2.5 text-xs text-slate-300">
+            <div className="bg-surface-2/60 border border-line/60 rounded-2xl p-4 space-y-2.5 text-xs text-fg">
               <div className="flex items-start gap-2.5">
                 <Calendar className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                  <span className="text-xs text-fg-muted uppercase font-bold block">
                     {lang === 'vi' ? 'Thời gian' : 'Time'}
                   </span>
-                  <span className="text-white font-medium text-xs">
+                  <span className="text-fg font-medium text-xs">
                     {new Date(event.start_at).toLocaleString('vi-VN', {
                       dateStyle: 'full',
                       timeStyle: 'short',
@@ -168,19 +168,19 @@ export const PublicTicketView: React.FC<PublicTicketViewProps> = ({ ticketCode, 
               </div>
 
               <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                <MapPin className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                  <span className="text-xs text-fg-muted uppercase font-bold block">
                     {lang === 'vi' ? 'Địa điểm' : 'Location'}
                   </span>
-                  <span className="text-white font-medium text-xs">{event.location}</span>
+                  <span className="text-fg font-medium text-xs">{event.location}</span>
                 </div>
               </div>
             </div>
 
             {/* High Resolution QR Code */}
-            <div className="bg-gradient-to-b from-indigo-950/40 to-slate-900 border-2 border-indigo-500/40 rounded-2xl p-5 text-center flex flex-col items-center">
-              <div className="bg-white p-3 rounded-2xl shadow-xl inline-block">
+            <div className="bg-canvas border-2 border-indigo-400/40 rounded-2xl p-5 text-center flex flex-col items-center">
+              <div className="bg-white p-3 rounded-2xl shadow-sm inline-block">
                 {qrDataUrl ? (
                   <img
                     src={qrDataUrl}
@@ -191,7 +191,7 @@ export const PublicTicketView: React.FC<PublicTicketViewProps> = ({ ticketCode, 
                   <div className="w-52 h-52 bg-slate-200 animate-pulse rounded-lg" />
                 )}
               </div>
-              <p className="text-xs text-indigo-300 font-medium mt-3">
+              <p className="text-xs text-indigo-400 font-medium mt-3">
                 {lang === 'vi'
                   ? 'Xuất trình mã QR này tại bàn đón tiếp để check-in'
                   : 'Present this QR code at reception to check-in'}
@@ -202,8 +202,8 @@ export const PublicTicketView: React.FC<PublicTicketViewProps> = ({ ticketCode, 
             <div
               className={`p-3.5 rounded-2xl border flex items-center justify-center gap-2 text-xs font-bold ${
                 isCheckedIn
-                  ? 'bg-emerald-950/50 border-emerald-500/50 text-emerald-300'
-                  : 'bg-amber-950/40 border-amber-500/40 text-amber-300'
+                  ? 'bg-emerald-500/10 border-emerald-400/40 text-emerald-400'
+                  : 'bg-amber-500/10 border-amber-400/40 text-amber-400'
               }`}
             >
               {isCheckedIn ? (
@@ -235,7 +235,7 @@ export const PublicTicketView: React.FC<PublicTicketViewProps> = ({ ticketCode, 
 
               <button
                 onClick={() => window.print()}
-                className="py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs border border-slate-700 transition"
+                className="py-3 px-4 bg-surface-2 hover:bg-surface-3 text-fg font-semibold rounded-xl text-xs border border-line transition"
               >
                 {lang === 'vi' ? 'In Vé' : 'Print'}
               </button>

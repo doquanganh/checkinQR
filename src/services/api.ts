@@ -7,9 +7,32 @@ import {
   EmailTemplate,
   CheckinStats,
   SmtpConfig,
+  Role,
+  User,
 } from '../types/index.js';
 
 const API_BASE = '/api';
+
+// Every call goes through this: an expired session (401) tells the app to show the login screen.
+// Shadows the global fetch inside this module on purpose.
+const fetch = async (input: string, init?: RequestInit): Promise<Response> => {
+  const res = await window.fetch(input, init);
+  if (res.status === 401 && !input.endsWith('/auth/login') && !input.endsWith('/auth/me')) {
+    window.dispatchEvent(new Event('auth:expired'));
+  }
+  return res;
+};
+
+async function call<T = any>(path: string, method: string, body?: unknown): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.success === false) throw new Error(data.message || `HTTP ${res.status}`);
+  return data;
+}
 
 export interface OfflineCheckinItem {
   id: string;
@@ -18,6 +41,44 @@ export interface OfflineCheckinItem {
 }
 
 export const api = {
+  // 0. Auth & accounts
+  async login(email: string, password: string): Promise<User> {
+    return (await call('/auth/login', 'POST', { email, password })).data;
+  },
+
+  async logout(): Promise<void> {
+    await call('/auth/logout', 'POST').catch(() => {});
+  },
+
+  async me(): Promise<User | null> {
+    try {
+      const res = await fetch(`${API_BASE}/auth/me`);
+      if (!res.ok) return null;
+      return (await res.json()).data;
+    } catch {
+      return null;
+    }
+  },
+
+  async changePassword(current_password: string, new_password: string): Promise<void> {
+    await call('/auth/change-password', 'POST', { current_password, new_password });
+  },
+
+  async listUsers(): Promise<User[]> {
+    return (await call('/users', 'GET')).data;
+  },
+
+  async createUser(data: { name: string; email: string; password: string; role: Role }): Promise<User> {
+    return (await call('/users', 'POST', data)).data;
+  },
+
+  async updateUser(
+    id: string,
+    patch: { name?: string; role?: Role; active?: boolean; password?: string }
+  ): Promise<User> {
+    return (await call(`/users/${id}`, 'PATCH', patch)).data;
+  },
+
   // 1. Events
   async getEvents(): Promise<EventItem[]> {
     try {
@@ -109,15 +170,6 @@ export const api = {
     if (!json.success) throw new Error(json.message);
   },
 
-  async bulkGenerateGuests(eventId: string, count = 1000): Promise<{ success: boolean; message: string; added: number; total: number }> {
-    const res = await fetch(`${API_BASE}/events/${eventId}/guests/bulk-generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ count }),
-    });
-    const json = await res.json();
-    return json;
-  },
 
   async importGuests(eventId: string, rows: any[]): Promise<any> {
     const res = await fetch(`${API_BASE}/events/${eventId}/guests/import`, {
@@ -213,6 +265,15 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(req),
       });
+      if (res.status === 401) {
+        // session expired mid-event: keep the scan, it syncs after the next login
+        this.enqueueOfflineCheckin(req);
+        return {
+          success: false,
+          status: 'ERROR',
+          message: 'Phiên đăng nhập đã hết hạn. Lượt quét đã được lưu và sẽ đồng bộ sau khi đăng nhập lại.',
+        };
+      }
       return await res.json();
     } catch (err: any) {
       // Offline fallback: store in offline queue
@@ -223,15 +284,6 @@ export const api = {
         message: 'Mất kết nối mạng! Lượt quét đã được lưu vào hàng đợi offline và sẽ tự động đồng bộ khi có mạng.',
       };
     }
-  },
-
-  async testRaceCondition(eventId: string, qrToken: string, concurrency = 2): Promise<any> {
-    const res = await fetch(`${API_BASE}/checkin/test-race-condition`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event_id: eventId, qr_token: qrToken, concurrency }),
-    });
-    return res.json();
   },
 
   async resetCheckin(params: { eventId?: string; eventGuestId?: string }): Promise<any> {

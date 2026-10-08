@@ -1,82 +1,108 @@
 @import "tailwindcss";
 
-/* Mobile scanner & touch optimizations */
-#qr-reader-container.hidden {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
+/*
+ * Design tokens. Brand: Carbon Teal #042F32 + Mint Foam #D6FFCB, font Plus Jakarta Sans.
+ * Components use semantic names (bg-surface, text-fg, border-line...) and the `indigo-*` scale,
+ * which is remapped below to the teal brand scale, so the same classes serve light and dark.
+ * <html data-theme="light|dark"> is set in ThemeContext.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --font-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-#qr-reader-container:not(.hidden) {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 100% !important;
-  min-height: 100% !important;
-  margin: 0 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  text-align: center !important;
-  position: relative !important;
-  overflow: hidden !important;
+@theme inline {
+  --color-canvas: var(--c-canvas);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-surface-3: var(--c-surface-3);
+  --color-line: var(--c-line);
+  --color-fg: var(--c-fg);
+  --color-fg-muted: var(--c-fg-muted);
+  --color-fg-subtle: var(--c-fg-subtle);
+  --color-carbon: #042f32;
+  --color-mint: #d6ffcb;
 }
 
-#qr-reader-container video {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-  margin: 0 auto !important;
-  display: block !important;
-  border-radius: 0 !important;
+/* light is the default; the status-colour remaps below must not leak into dark */
+:root:not([data-theme="dark"]) {
+  color-scheme: light;
+  --c-canvas: #f3f8f4;
+  --c-surface: #ffffff;
+  --c-surface-2: #e9f2ec;
+  --c-surface-3: #d9e8de;
+  --c-line: #d6e4da;
+  --c-fg: #042f32;
+  --c-fg-muted: #3f5f60;
+  --c-fg-subtle: #5d7b7b;
+
+  /* brand scale (light): 600 = button, 400/300 = accent text, 900/950 = pale tints */
+  --color-indigo-50: #f1fcee;
+  --color-indigo-100: #d6ffcb;
+  --color-indigo-200: #053b3e;
+  --color-indigo-300: #07494a;
+  --color-indigo-400: #0b6a67;
+  --color-indigo-500: #0f8a80;
+  --color-indigo-600: #0b5f5e;
+  --color-indigo-700: #07494a;
+  --color-indigo-800: #053b3e;
+  --color-indigo-900: #d6ffcb;
+  --color-indigo-950: #eafbe5;
+
+  /* status tints (300/400 unreadable on white: darker shades; 900/950 become pale panels) */
+  --color-emerald-200: var(--color-emerald-800);
+  --color-emerald-300: var(--color-emerald-800);
+  --color-emerald-400: var(--color-emerald-700);
+  --color-emerald-950: var(--color-emerald-50);
+  --color-emerald-900: var(--color-emerald-100);
+  --color-rose-200: var(--color-rose-800);
+  --color-rose-300: var(--color-rose-800);
+  --color-rose-400: var(--color-rose-700);
+  --color-rose-950: var(--color-rose-50);
+  --color-rose-900: var(--color-rose-100);
+  --color-amber-200: var(--color-amber-800);
+  --color-amber-300: var(--color-amber-800);
+  --color-amber-400: var(--color-amber-700);
+  --color-amber-950: var(--color-amber-50);
+  --color-amber-900: var(--color-amber-100);
 }
 
-#qr-reader-container img {
-  display: none !important;
+[data-theme="dark"] {
+  color-scheme: dark;
+  --c-canvas: #031a1c;
+  --c-surface: #062b2e;
+  --c-surface-2: #0a3a3d;
+  --c-surface-3: #124c50;
+  --c-line: #165255;
+  --c-fg: #eafbe5;
+  --c-fg-muted: #a8cfc4;
+  --c-fg-subtle: #84ada5;
+
+  /* brand scale (dark): accents are mint, buttons stay teal with white text */
+  --color-indigo-50: #eafbe5;
+  --color-indigo-100: #d6ffcb;
+  --color-indigo-200: #c4f7ba;
+  --color-indigo-300: #a6efb6;
+  --color-indigo-400: #8eeaa8;
+  --color-indigo-500: #1f9c8c;
+  --color-indigo-600: #0f6b66;
+  --color-indigo-700: #0c5a57;
+  --color-indigo-800: #0a4a4b;
+  --color-indigo-900: #0a3a3d;
+  --color-indigo-950: #062b2e;
 }
 
-#qr-reader-container canvas {
-  display: none !important;
+body {
+  font-family: var(--font-sans);
+  background: var(--c-canvas);
+  color: var(--c-fg);
 }
-
-#qr-reader-container__scan_region {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 100% !important;
-  min-height: 100% !important;
-  margin: 0 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  position: relative !important;
-  overflow: hidden !important;
-  border-radius: 0 !important;
-}
-
-#qr-shaded-region {
-  display: none !important;
-}
-
-#qr-reader-container__header_message {
-  display: none !important;
-}
-
-/* Touch improvements */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-none {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* iOS zooms the page when a focused field is under 16px */
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }

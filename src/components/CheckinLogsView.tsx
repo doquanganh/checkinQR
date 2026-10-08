@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { EventItem, CheckinLog, CheckinResult } from '../types/index.js';
 import { api } from '../services/api.js';
 import { useLanguage } from '../context/LanguageContext.js';
+import { resultLabel } from '../utils/resultLabel.js';
 import {
   FileText,
   Search,
@@ -97,13 +98,13 @@ export const CheckinLogsView: React.FC<CheckinLogsViewProps> = ({ currentEvent }
   return (
     <div className="space-y-4">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/90 p-4 rounded-2xl border border-slate-800 shadow-lg">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface/90 p-4 rounded-2xl border border-line shadow-sm">
         <div>
-          <h2 className="text-lg font-black text-white flex items-center gap-2">
+          <h2 className="text-lg font-black text-fg flex items-center gap-2">
             <Shield className="w-5 h-5 text-indigo-400" />
             <span>{t.auditLogsTitle}</span>
           </h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-fg-muted">
             {t.auditLogsDesc}
           </p>
         </div>
@@ -112,7 +113,7 @@ export const CheckinLogsView: React.FC<CheckinLogsViewProps> = ({ currentEvent }
           <button
             onClick={fetchLogs}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 text-fg text-xs font-semibold border border-line transition cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>{t.refresh}</span>
@@ -120,7 +121,7 @@ export const CheckinLogsView: React.FC<CheckinLogsViewProps> = ({ currentEvent }
 
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>{t.exportLogsCsv}</span>
@@ -129,15 +130,15 @@ export const CheckinLogsView: React.FC<CheckinLogsViewProps> = ({ currentEvent }
       </div>
 
       {/* Filter Toolbar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-surface/90 p-3 rounded-2xl border border-line">
         <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+          <Search className="w-4 h-4 text-fg-muted absolute left-3 top-3" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t.searchLogsPlaceholder}
-            className="w-full rounded-xl bg-slate-950 border border-slate-700 pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-indigo-500"
+            className="w-full rounded-xl bg-canvas border border-line pl-9 pr-3 py-2 text-xs text-fg placeholder-slate-500 focus:outline-hidden focus:border-indigo-500"
           />
         </div>
 
@@ -145,24 +146,24 @@ export const CheckinLogsView: React.FC<CheckinLogsViewProps> = ({ currentEvent }
           <select
             value={resultFilter}
             onChange={(e) => setResultFilter(e.target.value)}
-            className="w-full rounded-xl bg-slate-950 border border-slate-700 px-3 py-2 text-xs text-slate-200 focus:outline-hidden focus:border-indigo-500"
+            className="w-full rounded-xl bg-canvas border border-line px-3 py-2 text-xs text-fg focus:outline-hidden focus:border-indigo-500"
           >
             <option value="">{t.allResults} ({logs.length})</option>
-            <option value="SUCCESS">SUCCESS ({lang === 'vi' ? 'Thành công' : 'Success'})</option>
-            <option value="ALREADY_CHECKED_IN">ALREADY_CHECKED_IN ({lang === 'vi' ? 'Quét trùng' : 'Duplicate'})</option>
-            <option value="INVALID_QR">INVALID_QR ({lang === 'vi' ? 'Mã sai / Không tồn tại' : 'Invalid QR'})</option>
-            <option value="WRONG_EVENT">WRONG_EVENT ({lang === 'vi' ? 'Vé sự kiện khác' : 'Wrong Event'})</option>
-            <option value="GUEST_INACTIVE">GUEST_INACTIVE ({lang === 'vi' ? 'Khách bị khoá/thu hồi' : 'Locked / Revoked'})</option>
+            <option value="SUCCESS">{resultLabel('SUCCESS', lang)}</option>
+            <option value="ALREADY_CHECKED_IN">{resultLabel('ALREADY_CHECKED_IN', lang)}</option>
+            <option value="INVALID_QR">{resultLabel('INVALID_QR', lang)}</option>
+            <option value="WRONG_EVENT">{resultLabel('WRONG_EVENT', lang)}</option>
+            <option value="GUEST_INACTIVE">{resultLabel('GUEST_INACTIVE', lang)}</option>
           </select>
         </div>
       </div>
 
       {/* Audit Log Table */}
-      <div className="rounded-2xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-xl">
+      <div className="rounded-2xl bg-surface/90 border border-line overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/80 text-slate-400 font-bold uppercase tracking-wider">
+              <tr className="border-b border-line bg-surface/80 text-fg-muted font-bold uppercase tracking-wider">
                 <th className="p-3 pl-4">{t.thTime}</th>
                 <th className="p-3">{t.thResult}</th>
                 <th className="p-3">{t.thGuest}</th>
@@ -172,16 +173,16 @@ export const CheckinLogsView: React.FC<CheckinLogsViewProps> = ({ currentEvent }
                 <th className="p-3 pr-4">{t.thNotes}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+            <tbody className="divide-y divide-line/60 font-mono text-xs">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-400 font-sans">
+                  <td colSpan={7} className="text-center py-12 text-fg-muted font-sans">
                     {lang === 'vi' ? 'Đang tải nhật ký...' : 'Loading audit logs...'}
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-400 font-sans">
+                  <td colSpan={7} className="text-center py-12 text-fg-muted font-sans">
                     {t.noLogsFound}
                   </td>
                 </tr>
@@ -192,22 +193,22 @@ export const CheckinLogsView: React.FC<CheckinLogsViewProps> = ({ currentEvent }
                   const isInvalid = log.result === 'INVALID_QR' || log.result === 'WRONG_EVENT';
 
                   return (
-                    <tr key={log.id} className="hover:bg-slate-800/50 transition">
-                      <td className="p-3 pl-4 text-slate-400 whitespace-nowrap">
+                    <tr key={log.id} className="hover:bg-surface-2/50 transition">
+                      <td className="p-3 pl-4 text-fg-muted whitespace-nowrap">
                         {new Date(log.created_at).toLocaleTimeString(lang === 'vi' ? 'vi-VN' : 'en-US')}
-                        <span className="text-[10px] text-slate-500 block">
+                        <span className="text-xs text-fg-subtle block">
                           {new Date(log.created_at).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}
                         </span>
                       </td>
 
                       <td className="p-3">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase inline-flex items-center gap-1 ${
+                          className={`px-2 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1 whitespace-nowrap ${
                             isSuccess
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-400/40'
                               : isDuplicate
-                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                              : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              ? 'bg-amber-500/10 text-amber-400 border border-amber-400/40'
+                              : 'bg-rose-500/10 text-rose-400 border border-rose-400/40'
                           }`}
                         >
                           {isSuccess ? (
@@ -217,28 +218,28 @@ export const CheckinLogsView: React.FC<CheckinLogsViewProps> = ({ currentEvent }
                           ) : (
                             <XCircle className="w-3 h-3" />
                           )}
-                          <span>{log.result}</span>
+                          <span>{resultLabel(log.result, lang)}</span>
                         </span>
                       </td>
 
-                      <td className="p-3 font-sans font-bold text-white">
-                        {log.guest_name || <span className="text-slate-500 font-mono">N/A</span>}
+                      <td className="p-3 font-sans font-bold text-fg">
+                        {log.guest_name || <span className="text-fg-subtle font-mono">N/A</span>}
                       </td>
 
-                      <td className="p-3 font-sans text-slate-300">
+                      <td className="p-3 font-sans text-fg">
                         {log.guest_org || '—'}
                       </td>
 
-                      <td className="p-3 font-sans text-slate-200">
+                      <td className="p-3 font-sans text-fg">
                         {log.staff_name}
                       </td>
 
-                      <td className="p-3 text-slate-400">
+                      <td className="p-3 text-fg-muted">
                         <div>{log.device_id}</div>
-                        <div className="text-[10px] text-slate-500">{log.ip_address}</div>
+                        <div className="text-xs text-fg-subtle">{log.ip_address}</div>
                       </td>
 
-                      <td className="p-3 pr-4 font-sans text-slate-400 max-w-xs truncate">
+                      <td className="p-3 pr-4 font-sans text-fg-muted max-w-xs truncate">
                         {log.message}
                       </td>
                     </tr>
