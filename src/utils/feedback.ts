@@ -94,12 +94,14 @@ class SoundFeedback {
   // Tactile feedback on mobile devices
   triggerHaptic(type: 'success' | 'warning' | 'error') {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      // Distinct at a glance, without looking at the screen:
+      // success = one short tick, re-scan = two long pulses, error = three quick pulses
       if (type === 'success') {
-        navigator.vibrate([70, 50, 90]);
+        navigator.vibrate(80);
       } else if (type === 'warning') {
         navigator.vibrate([150, 100, 150]);
       } else {
-        navigator.vibrate([250]);
+        navigator.vibrate([60, 40, 60, 40, 60]);
       }
     }
   }
