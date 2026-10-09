@@ -253,7 +253,7 @@ export const EmailTemplateView: React.FC<EmailTemplateViewProps> = ({
             </div>
             <div>
               <label className="block text-xs font-semibold text-fg mb-1">
-                {lang === 'vi' ? 'Email Người gửi' : 'Sender Email'}
+                {lang === 'vi' ? 'Email hiển thị (xem trước)' : 'Display email (preview only)'}
               </label>
               <input
                 type="text"
@@ -263,6 +263,15 @@ export const EmailTemplateView: React.FC<EmailTemplateViewProps> = ({
               />
             </div>
           </div>
+          <p className="-mt-2 text-xs leading-relaxed text-fg-muted">
+            {lang === 'vi'
+              ? `Ô email chỉ dùng để hiển thị trong khung xem trước. Thư thật luôn gửi từ tài khoản SMTP đã cài${
+                  smtpConfig?.isConfigured && smtpConfig.fromEmail ? ` (${smtpConfig.fromEmail})` : ''
+                }.`
+              : `The email box is only shown in the preview. Real mail is always sent from the configured SMTP account${
+                  smtpConfig?.isConfigured && smtpConfig.fromEmail ? ` (${smtpConfig.fromEmail})` : ''
+                }.`}
+          </p>
 
           {/* Quick Insert Variables */}
           <div>
