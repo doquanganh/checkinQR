@@ -581,19 +581,22 @@ export const GuestList: React.FC<GuestListProps> = ({
                 </div>
 
                 {/* Bottom Action Toolbar */}
-                <div className="mt-3 pt-2.5 border-t border-line/80 flex flex-wrap items-center justify-between gap-2">
+                <div className="mt-3 pt-2.5 border-t border-line/80 flex items-center justify-between gap-2">
                   <button
                     onClick={() => onOpenInvitationModal(eg)}
-                    className="flex-1 min-w-[7.5rem] flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-400/40 font-bold text-xs transition whitespace-nowrap"
+                    className="flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2 px-2.5 sm:px-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-400/40 font-bold text-xs transition whitespace-nowrap"
                   >
                     <QrCode className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>{t.btnViewQrInvite}</span>
+                    {/* short label on phones so edit/delete stay on the same row */}
+                    <span className="sm:hidden min-[370px]:hidden">QR</span>
+                    <span className="hidden min-[370px]:inline sm:hidden">{lang === 'vi' ? 'QR & Thư' : 'QR & Mail'}</span>
+                    <span className="hidden sm:inline">{t.btnViewQrInvite}</span>
                   </button>
 
                   {/* Check-in Quick Button for both Admin and Staff */}
                   <button
                     onClick={() => handleToggleCheckin(eg)}
-                    className={`flex items-center gap-1 py-2 px-2.5 rounded-xl border text-xs font-bold transition whitespace-nowrap ${
+                    className={`shrink-0 flex items-center gap-1 py-2 px-2.5 rounded-xl border text-xs font-bold transition whitespace-nowrap ${
                       isCheckedIn
                         ? 'bg-emerald-500/10 border-emerald-400/40 text-emerald-400'
                         : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border-indigo-400/40'
@@ -608,7 +611,7 @@ export const GuestList: React.FC<GuestListProps> = ({
                     <>
                       <button
                         onClick={() => onOpenEditModal(eg)}
-                        className="p-2 rounded-xl bg-surface-2 hover:bg-surface-3 text-fg border border-line text-xs transition"
+                        className="shrink-0 p-2 rounded-xl bg-surface-2 hover:bg-surface-3 text-fg border border-line text-xs transition"
                         title={t.btnEdit}
                       >
                         <Edit2 className="w-4 h-4" />
@@ -616,7 +619,7 @@ export const GuestList: React.FC<GuestListProps> = ({
 
                       <button
                         onClick={() => handleDeleteGuest(eg.id, g?.full_name)}
-                        className="p-2 rounded-xl bg-surface-2 hover:bg-rose-500/10 text-fg-muted hover:text-rose-400 border border-line text-xs transition"
+                        className="shrink-0 p-2 rounded-xl bg-surface-2 hover:bg-rose-500/10 text-fg-muted hover:text-rose-400 border border-line text-xs transition"
                         title={t.btnDelete}
                       >
                         <Trash2 className="w-4 h-4" />
