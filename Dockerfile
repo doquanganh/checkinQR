@@ -7,6 +7,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 make g+
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+# Docker has no git: the deploy passes the commit in. Placed after `npm ci` so it never invalidates the dependency layer.
+ARG GIT_SHA=unknown
+ARG BUILT_AT=
+ENV GIT_SHA=$GIT_SHA BUILT_AT=$BUILT_AT
 RUN npm run build && npm prune --omit=dev
 
 # ---- runtime ----
@@ -23,6 +27,10 @@ COPY server ./server
 COPY src ./src
 COPY scripts ./scripts
 RUN mkdir -p /data && chown node:node /data
+# reported by GET /api/health
+ARG GIT_SHA=unknown
+ARG BUILT_AT=
+ENV GIT_SHA=$GIT_SHA BUILT_AT=$BUILT_AT
 USER node
 VOLUME /data
 EXPOSE 3000

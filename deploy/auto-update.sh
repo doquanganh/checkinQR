@@ -50,7 +50,11 @@ main() {
   }
 
   # keep the cron log short: build chatter goes to $BUILD_LOG, only its tail is shown on failure
-  build() { docker compose up -d --build >"$BUILD_LOG" 2>&1; }
+  # GIT_SHA/BUILT_AT are what the app shows as its version; recomputed on every call so a rollback reports the old commit
+  build() {
+    GIT_SHA="$(git rev-parse --short HEAD)" BUILT_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      docker compose up -d --build >"$BUILD_LOG" 2>&1
+  }
 
   if build && healthy; then
     rm -f "$FAILED_FILE"

@@ -46,6 +46,13 @@ describe('auth', () => {
     expect((await request(app).get('/api/health')).body.status).toBe('ok');
   });
 
+  it('health reports the deployed version and commit', async () => {
+    const body = (await request(app).get('/api/health')).body;
+    expect(body.version).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(body).toHaveProperty('commit');
+    expect(body).toHaveProperty('built_at');
+  });
+
   it('rejects bad credentials and unknown users', async () => {
     expect((await login('admin@test.local', 'wrong-password')).res.status).toBe(401);
     expect((await login('nobody@test.local', 'whatever123')).res.status).toBe(401);

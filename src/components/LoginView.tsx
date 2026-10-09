@@ -3,6 +3,7 @@ import { Loader2, LogIn, QrCode } from 'lucide-react';
 import { api } from '../services/api.js';
 import { useLanguage } from '../context/LanguageContext.js';
 import { ThemeToggle } from './ThemeToggle.js';
+import { VersionBadge } from './VersionBadge.js';
 import type { User } from '../types/index.js';
 
 export const LoginView: React.FC<{ onLoggedIn: (user: User) => void }> = ({ onLoggedIn }) => {
@@ -92,8 +93,8 @@ export const LoginView: React.FC<{ onLoggedIn: (user: User) => void }> = ({ onLo
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
           <span>{vi ? 'Đăng nhập' : 'Sign in'}</span>
         </button>
-
       </form>
+      <VersionBadge className="absolute bottom-4 left-0 right-0" />
     </div>
   );
 };

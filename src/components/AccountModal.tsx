@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Globe, KeyRound, Loader2, LogOut, Shield, UserPlus, X } from 'lucide-react';
 import { api } from '../services/api.js';
 import { useLanguage } from '../context/LanguageContext.js';
+import { VersionBadge } from './VersionBadge.js';
 import type { Role, User } from '../types/index.js';
 
 interface Props {
@@ -232,6 +233,7 @@ export const AccountModal: React.FC<Props> = ({ isOpen, onClose, currentUser, on
             <LogOut className="w-4 h-4" />
             {vi ? 'Đăng xuất' : 'Sign out'}
           </button>
+          <VersionBadge className="mt-3" />
         </div>
       </div>
     </div>

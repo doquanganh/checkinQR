@@ -1,6 +1,6 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
 import helmet from 'helmet';
-import { config } from './config.ts';
+import { buildInfo, config } from './config.ts';
 import { db } from './db.ts';
 import { apiRouter } from './api.ts';
 import { attachUser, authRouter } from './auth.ts';
@@ -60,7 +60,13 @@ export function createApp() {
   app.get('/api/health', (_req, res) => {
     try {
       db.sqlite.prepare('SELECT 1').get();
-      res.json({ status: 'ok', timestamp: new Date().toISOString() });
+      res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        version: buildInfo.version,
+        commit: buildInfo.commit,
+        built_at: buildInfo.builtAt,
+      });
     } catch {
       res.status(503).json({ status: 'error' });
     }

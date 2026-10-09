@@ -19,6 +19,7 @@ import { CreateEventModal } from './components/CreateEventModal.js';
 import { SmtpSettingsModal } from './components/SmtpSettingsModal.js';
 import { PublicTicketView } from './components/PublicTicketView.js';
 import { OfflineIndicator } from './components/OfflineIndicator.js';
+import { UpdateBanner } from './components/UpdateBanner.js';
 import { BottomNav } from './components/BottomNav.js';
 import { EventSelectModal } from './components/SelectModals.js';
 import { AccountModal } from './components/AccountModal.js';
@@ -142,6 +143,7 @@ export default function App() {
     <div className="min-h-screen bg-canvas text-fg flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Offline Status Banner */}
       <OfflineIndicator />
+      <UpdateBanner />
 
       {/* App Header */}
       <Header

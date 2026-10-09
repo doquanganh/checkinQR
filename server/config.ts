@@ -1,5 +1,7 @@
 import 'dotenv/config';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const env = process.env;
 
@@ -16,6 +18,17 @@ function resolveSecret(): string {
   }
   return 'dev-only-secret-do-not-use-in-production-0000';
 }
+
+// What is deployed: version from package.json, commit/time injected at build (see Dockerfile, deploy/auto-update.sh)
+const pkgVersion: string = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf8')
+).version;
+
+export const buildInfo = {
+  version: pkgVersion,
+  commit: env.GIT_SHA || 'unknown',
+  builtAt: env.BUILT_AT || '',
+};
 
 export const config = {
   port: env.PORT ? parseInt(env.PORT, 10) : 3000,

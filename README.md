@@ -126,7 +126,15 @@ Mở `https://<DOMAIN>`, đăng nhập bằng `ADMIN_EMAIL` / `ADMIN_PASSWORD`, 
 
 **VPS đã có nginx (hoặc app khác) giữ cổng 80/443:** không dùng Caddy kèm theo. Chạy `docker compose up -d --build` (không có `--profile caddy`); ứng dụng chỉ lắng nghe ở `127.0.0.1:3010` (đổi bằng `APP_PORT` trong `.env`). Rồi dùng mẫu [deploy/nginx.conf.example](deploy/nginx.conf.example) để thêm một khối server cho tên miền và cấp HTTPS bằng `certbot --nginx -d <tên-miền>`. Mẫu đã cấu hình sẵn không đệm bộ nhớ cho luồng dashboard trực tiếp (SSE). Đặt `DOMAIN` trong `.env` đúng tên miền đó để ứng dụng biết địa chỉ công khai của nó.
 
-**Cập nhật phiên bản:** `git pull && docker compose up -d --build` (thêm `--profile caddy` nếu dùng Caddy). Dữ liệu nằm trong volume `checkin_data` nên không mất khi build lại.
+**Cập nhật phiên bản:** cách nhanh nhất là `bash /opt/checkin/deploy/auto-update.sh` (kéo code, build lại, kiểm tra sức khoẻ, tự quay lui nếu lỗi). Muốn ép build lại mà không có commit mới (ví dụ vừa đổi `.env`), chạy lệnh dưới đây để ứng dụng biết đúng phiên bản của nó (thêm `--profile caddy` nếu dùng Caddy). Dữ liệu nằm trong volume `checkin_data` nên không mất khi build lại.
+
+```text
+cd /opt/checkin && GIT_SHA=$(git rev-parse --short HEAD) BUILT_AT=$(date -u +%FT%TZ) docker compose up -d --build
+```
+
+**Biết đang chạy bản nào:** ứng dụng hiển thị `v2.2.0 · 7f581dd · 09/10/2026 10:40` ở cuối hộp thoại Tài khoản và dưới màn đăng nhập (số phiên bản · mã commit · giờ build). Từ dòng lệnh: `curl http://127.0.0.1:3010/api/health` trả `version`, `commit`, `built_at`. So mã commit với GitHub để biết VPS đã nhận commit mới nhất chưa. Nếu ứng dụng trên điện thoại đang chạy bản cũ hơn máy chủ, nó hiện thanh "Đã có phiên bản mới" kèm nút tải lại. Nếu mã commit hiện `unknown`, bản đó được build mà không truyền `GIT_SHA` (xem lệnh ở trên).
+
+**Quy ước nâng số phiên bản** (sửa `version` trong `package.json`, ví dụ `npm version 2.2.1 --no-git-tag-version`): tăng số cuối khi sửa lỗi nhỏ (2.2.0 → 2.2.1); tăng số giữa khi thêm tính năng hoặc đổi giao diện đáng kể (2.2.1 → 2.3.0); tăng số đầu khi thay đổi làm hỏng dữ liệu hoặc cách dùng cũ (3.0.0). Mã commit tự đổi theo mỗi lần cập nhật nên không cần nâng số cho từng sửa nhỏ.
 
 **Tự cập nhật khi có commit mới trên GitHub:** [deploy/auto-update.sh](deploy/auto-update.sh) chạy bằng cron trên VPS. Nó chỉ làm khi `origin/main` có commit mới: tiến thẳng (`--ff-only`), build lại, kiểm tra `/api/health`; nếu bản mới không khỏe thì tự quay về commit cũ và nhớ commit lỗi để không build lại liên tục. Không chạm vào thư mục có sửa đổi cục bộ.
 
@@ -180,6 +188,12 @@ Bản sao lưu nằm ở `/data/backups/` trong volume (giữ 14 bản gần nh�
 ---
 
 ## 6. Nhật ký thay đổi (CHANGELOG)
+
+### [2.2.0] - 2026-10-09
+- Hiển thị phiên bản, mã commit và giờ build trong ứng dụng và ở `/api/health`; thanh "Đã có phiên bản mới" khi máy khách chạy bản cũ hơn máy chủ.
+- Giao diện sáng/tối với bảng màu Carbon Teal và Mint Foam; bố cục gọn cho điện thoại; thẻ kết quả quét và nhãn trạng thái dễ đọc.
+- Sửa camera quét QR hiện khung đen và lỗi một lượt quét bị gửi nhiều lần; mẫu rung riêng cho từng kết quả.
+- Triển khai sau nginx có sẵn (Caddy tuỳ chọn), tự cập nhật bằng cron kèm kiểm tra sức khoẻ và quay lui.
 
 ### [2.1.0] - 2026-10-08
 - Lưu dữ liệu bền bằng SQLite (WAL, migration tự động); check-in atomic ở tầng DB.
