@@ -21,6 +21,7 @@ import {
   History,
   QrCode,
   Upload,
+  ZoomIn,
 } from 'lucide-react';
 
 interface CheckinScannerProps {
@@ -34,6 +35,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
 }) => {
   const { lang, t } = useLanguage();
   const [scannerActive, setScannerActive] = useState(false);
+  const [zoom, setZoom] = useState<{ min: number; max: number; step: number; value: number } | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -64,6 +66,8 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
 
       const qrScanner = new Html5Qrcode(scannerContainerId, {
         formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        // native BarcodeDetector (Chrome/Android) reads small and slightly blurry codes far better than the JS decoder
+        useBarCodeDetectorIfSupported: true,
         verbose: false,
       });
       html5QrCodeRef.current = qrScanner;
@@ -71,6 +75,12 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
       await qrScanner.start(
         { facingMode: facingMode },
         {
+          // full-HD frames keep small QR codes sharp; continuous autofocus is requested right after start
+          videoConstraints: {
+            facingMode: { ideal: facingMode },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
           fps: 15,
           qrbox: (viewfinderWidth, viewfinderHeight) => {
             const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
@@ -88,6 +98,29 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
       );
 
       setScannerActive(true);
+
+      // Autofocus: many phones start in single-shot focus, which blurs small codes held at arm's length
+      try {
+        // focusMode is supported by Chrome/Android but missing from TypeScript's DOM typings
+        await qrScanner.applyVideoConstraints({
+          advanced: [{ focusMode: 'continuous' } as unknown as MediaTrackConstraintSet],
+        });
+      } catch {
+        /* this camera has no focus control, nothing to do */
+      }
+      // Zoom slider, only when the camera exposes it
+      try {
+        const z = qrScanner.getRunningTrackCameraCapabilities().zoomFeature();
+        if (z.isSupported()) {
+          const min = z.min();
+          const max = z.max();
+          setZoom({ min, max, step: z.step() || 0.1, value: Math.min(max, Math.max(min, z.value() ?? min)) });
+        } else {
+          setZoom(null);
+        }
+      } catch {
+        setZoom(null);
+      }
     } catch (err: any) {
       console.warn('Camera start error:', err);
       const inUse = err?.name === 'NotReadableError' || err?.name === 'TrackStartError';
@@ -109,6 +142,16 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
       }
     } catch {}
     setScannerActive(false);
+    setZoom(null);
+  };
+
+  const changeZoom = async (value: number) => {
+    setZoom((z) => (z ? { ...z, value } : z));
+    try {
+      await html5QrCodeRef.current?.getRunningTrackCameraCapabilities().zoomFeature().apply(value);
+    } catch {
+      /* ignore: the slider just stays where the camera allows */
+    }
   };
 
   // Flip Front / Rear camera
@@ -284,6 +327,24 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
                   </span>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Zoom: lets staff get a small QR big enough to read without moving closer */}
+          {scannerActive && zoom && zoom.max > zoom.min && (
+            <div className="absolute bottom-3 left-4 right-4 z-30 flex items-center gap-3 rounded-full bg-black/60 px-4 py-2 text-white">
+              <ZoomIn className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <input
+                type="range"
+                min={zoom.min}
+                max={zoom.max}
+                step={zoom.step}
+                value={zoom.value}
+                onChange={(e) => changeZoom(Number(e.target.value))}
+                aria-label={lang === 'vi' ? 'Phóng to' : 'Zoom'}
+                className="w-full accent-emerald-400"
+              />
+              <span className="text-xs font-mono w-10 text-right shrink-0">{zoom.value.toFixed(1)}x</span>
             </div>
           )}
 
