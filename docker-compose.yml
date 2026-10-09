@@ -7,12 +7,15 @@ services:
       APP_URL: https://${DOMAIN}
     volumes:
       - checkin_data:/data
-    expose:
-      - "3000"
+    # Loopback only: reach the app through your own reverse proxy (nginx...) or the Caddy profile below
+    ports:
+      - "127.0.0.1:${APP_PORT:-3010}:3000"
     stop_grace_period: 15s
 
-  # Automatic HTTPS (Let's Encrypt). Camera scanning and PWA install require HTTPS.
+  # Optional bundled HTTPS proxy (Let's Encrypt): `docker compose --profile caddy up -d --build`.
+  # Skip it when the server already runs nginx/Caddy on ports 80/443. Camera scanning and PWA need HTTPS.
   caddy:
+    profiles: ["caddy"]
     image: caddy:2
     restart: unless-stopped
     depends_on:

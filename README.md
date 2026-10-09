@@ -109,7 +109,7 @@ Cần: VPS Linux có Docker + Docker Compose, một tên miền trỏ về IP VP
 git clone https://github.com/doquanganh/checkinQR.git /opt/checkin && cd /opt/checkin
 cp .env.example .env
 # Sửa .env: DOMAIN, APP_SECRET (openssl rand -hex 32), ADMIN_EMAIL, ADMIN_PASSWORD, SMTP_*
-docker compose up -d --build
+docker compose --profile caddy up -d --build     # kèm Caddy (HTTPS tự động), cần cổng 80/443 còn trống
 docker compose logs -f app      # chờ dòng "Event Guest & QR Check-in Server running"
 ```
 
@@ -124,7 +124,9 @@ Mở `https://<DOMAIN>`, đăng nhập bằng `ADMIN_EMAIL` / `ADMIN_PASSWORD`, 
 | `SEED_SAMPLE_DATA` | `true` để nạp dữ liệu mẫu (mặc định tắt ở production) |
 | `ENABLE_DEMO_TOOLS` | `true` để bật nút reset check-in, tạo 1,000 khách mẫu, test race (mặc định tắt ở production) |
 
-**Cập nhật phiên bản:** `git pull && docker compose up -d --build`. Dữ liệu nằm trong volume `checkin_data` nên không mất khi build lại.
+**VPS đã có nginx (hoặc app khác) giữ cổng 80/443:** không dùng Caddy kèm theo. Chạy `docker compose up -d --build` (không có `--profile caddy`); ứng dụng chỉ lắng nghe ở `127.0.0.1:3010` (đổi bằng `APP_PORT` trong `.env`). Rồi dùng mẫu [deploy/nginx.conf.example](deploy/nginx.conf.example) để thêm một khối server cho tên miền và cấp HTTPS bằng `certbot --nginx -d <tên-miền>`. Mẫu đã cấu hình sẵn không đệm bộ nhớ cho luồng dashboard trực tiếp (SSE). Đặt `DOMAIN` trong `.env` đúng tên miền đó để ứng dụng biết địa chỉ công khai của nó.
+
+**Cập nhật phiên bản:** `git pull && docker compose up -d --build` (thêm `--profile caddy` nếu dùng Caddy). Dữ liệu nằm trong volume `checkin_data` nên không mất khi build lại.
 
 **Sao lưu** (DB là một file SQLite, backup an toàn khi app đang chạy). Thêm vào crontab của VPS:
 

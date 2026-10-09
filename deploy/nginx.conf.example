@@ -1,0 +1,41 @@
+# nginx server block for CheckinQR, to use when the host already runs nginx on ports 80/443.
+#
+#   sudo cp deploy/nginx.conf.example /etc/nginx/sites-available/eventgate
+#   sudo sed -i 's/eventgate.example.com/YOUR.DOMAIN/g' /etc/nginx/sites-available/eventgate
+#   sudo ln -s /etc/nginx/sites-available/eventgate /etc/nginx/sites-enabled/
+#   sudo nginx -t && sudo systemctl reload nginx
+#   sudo certbot --nginx -d YOUR.DOMAIN        # adds the HTTPS listener and the redirect
+#
+# The app listens on 127.0.0.1:3010 (APP_PORT in .env).
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name eventgate.example.com;
+
+    # CSV/Excel import posts up to ~5 MB of JSON
+    client_max_body_size 6m;
+
+    location / {
+        proxy_pass http://127.0.0.1:3010;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Live dashboard (Server-Sent Events): no buffering, long-lived connection
+    location ~ ^/api/events/[^/]+/stream$ {
+        proxy_pass http://127.0.0.1:3010;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 3600s;
+    }
+}
