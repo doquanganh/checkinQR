@@ -88,7 +88,14 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
       setScannerActive(true);
     } catch (err: any) {
       console.warn('Camera start error:', err);
-      setCameraError(t.cameraDeniedMsg);
+      const inUse = err?.name === 'NotReadableError' || err?.name === 'TrackStartError';
+      setCameraError(
+        inUse
+          ? lang === 'vi'
+            ? 'Camera đang được ứng dụng khác sử dụng. Hãy đóng ứng dụng đó rồi thử lại.'
+            : 'The camera is in use by another app. Close it and try again.'
+          : t.cameraDeniedMsg
+      );
       setScannerActive(false);
     }
   };
@@ -241,9 +248,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
         <div className="relative w-full min-h-[340px] xs:min-h-[380px] sm:min-h-[440px] flex items-center justify-center bg-black overflow-hidden">
           <div
             id={scannerContainerId}
-            className={`w-full h-full min-h-[340px] xs:min-h-[380px] sm:min-h-[440px] flex items-center justify-center overflow-hidden ${
-              scannerActive ? 'flex' : 'hidden'
-            }`}
+            className="w-full h-full min-h-[340px] xs:min-h-[380px] sm:min-h-[440px] flex items-center justify-center overflow-hidden"
           />
 
           {/* Centered QR Viewfinder Reticle Overlay */}
@@ -267,7 +272,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
           )}
 
           {!scannerActive && (
-            <div className="w-full max-w-sm mx-auto flex flex-col items-center justify-center text-center p-4 sm:p-6 space-y-4">
+            <div className="absolute inset-0 z-20 bg-black flex flex-col items-center justify-center text-center p-4 sm:p-6 space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-400/40 flex items-center justify-center mx-auto text-indigo-400 shadow-sm">
                 <Camera className="w-8 h-8" />
               </div>
