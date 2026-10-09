@@ -45,6 +45,8 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
   >([]);
 
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
+  // always points at the latest handleScannedCode (the camera callback is created once, at start)
+  const scanHandlerRef = useRef<(code: string, deliberate?: boolean) => void>(() => {});
   const scannerContainerId = 'qr-reader-container';
 
   // Device ID for audit log
@@ -78,7 +80,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
           aspectRatio: 1.0,
         },
         (decodedText) => {
-          handleScannedCode(decodedText);
+          scanHandlerRef.current(decodedText);
         },
         () => {
           // parse errors are normal while seeking QR
@@ -129,8 +131,19 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
   }, []);
 
   // Main check-in processor
-  const handleScannedCode = async (code: string) => {
-    if (processing || !code.trim()) return;
+  // The camera reports the same QR ~15x/second and its callback keeps the state from when it started,
+  // so the guard must be a ref. Same code is ignored for a few seconds; typed/uploaded codes are deliberate.
+  const processingRef = useRef(false);
+  const lastScanRef = useRef({ code: '', at: 0 });
+  const SAME_CODE_COOLDOWN_MS = 6000;
+
+  const handleScannedCode = async (code: string, deliberate = false) => {
+    const clean = code.trim();
+    if (processingRef.current || !clean) return;
+    const now = Date.now();
+    if (!deliberate && lastScanRef.current.code === clean && now - lastScanRef.current.at < SAME_CODE_COOLDOWN_MS) return;
+    lastScanRef.current = { code: clean, at: now };
+    processingRef.current = true;
     setProcessing(true);
 
     try {
@@ -178,10 +191,13 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
     } finally {
       // Pause slightly so user can read screen before scanning again
       setTimeout(() => {
+        processingRef.current = false;
         setProcessing(false);
       }, 1500);
     }
   };
+
+  scanHandlerRef.current = handleScannedCode;
 
   // Upload QR Image fallback (for desktop testing or photo)
   const handleFileScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,7 +207,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
     try {
       const scanner = new Html5Qrcode('qr-temp-reader');
       const result = await scanner.scanFile(file, true);
-      handleScannedCode(result);
+      handleScannedCode(result, true);
       scanner.clear();
     } catch {
       setLastResult({
@@ -419,7 +435,7 @@ export const CheckinScanner: React.FC<CheckinScannerProps> = ({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleScannedCode(manualCode);
+            handleScannedCode(manualCode, true);
           }}
           className="flex gap-2"
         >
