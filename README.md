@@ -128,6 +128,14 @@ Mở `https://<DOMAIN>`, đăng nhập bằng `ADMIN_EMAIL` / `ADMIN_PASSWORD`, 
 
 **Cập nhật phiên bản:** `git pull && docker compose up -d --build` (thêm `--profile caddy` nếu dùng Caddy). Dữ liệu nằm trong volume `checkin_data` nên không mất khi build lại.
 
+**Tự cập nhật khi có commit mới trên GitHub:** [deploy/auto-update.sh](deploy/auto-update.sh) chạy bằng cron trên VPS. Nó chỉ làm khi `origin/main` có commit mới: tiến thẳng (`--ff-only`), build lại, kiểm tra `/api/health`; nếu bản mới không khỏe thì tự quay về commit cũ và nhớ commit lỗi để không build lại liên tục. Không chạm vào thư mục có sửa đổi cục bộ.
+
+```text
+(crontab -e)  */5 * * * * bash /opt/checkin/deploy/auto-update.sh >> /var/log/checkin-update.log 2>&1
+```
+
+Xem nhật ký: `tail -f /var/log/checkin-update.log`. **Tắt trong ngày sự kiện** bằng cách gỡ dòng cron đó, để một commit lỗi không thể lên production lúc đang soát vé.
+
 **Sao lưu** (DB là một file SQLite, backup an toàn khi app đang chạy). Thêm vào crontab của VPS:
 
 ```bash
